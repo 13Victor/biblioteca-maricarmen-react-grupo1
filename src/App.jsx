@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import ImportCSV from "./components/ImportCSV";
 
+import "./lookfeel.css";
 
 function App() {
     return (

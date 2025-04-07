@@ -2,22 +2,26 @@ import { useState } from "react";
 import "./ImportCSV.css";
 
 function ImportCSV() {
+    // Estado principal para datos y validación
     const [data, setData] = useState([]);
-    const [stats, setStats] = useState({ created: 0, updated: 0, errors: 0 });
-    const [showResults, setShowResults] = useState(false);
-    const [showSaveStats, setShowSaveStats] = useState(false);
-    const [rowResults, setRowResults] = useState([]);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [errorDetails, setErrorDetails] = useState([]);
-    const [apiResponseMessage, setApiResponseMessage] = useState("");
-    const [userResults, setUserResults] = useState({});
-    const [showValidUsers, setShowValidUsers] = useState(false);
-    const [hasValidationErrors, setHasValidationErrors] = useState(false);
-    const [showValidation, setShowValidation] = useState(false);
+
+    // Variables estado información dinámica
+    const [uiState, setUiState] = useState({
+        showValidation: false,
+        showResults: false,
+        validationError: false,
+        showUserResults: false,
+        message: "",
+    });
+
+    // Estado para resultados de validación
+    const [validationResults, setValidationResults] = useState([]);
+
+    // Estado para resultados de la API
+    const [apiResults, setApiResults] = useState({});
 
     const checkCurrentRow = (row, headers) => {
-        const EXPECTED_COLUMNS = ["nom", "cognom1", "cognom2", "email", "telefon", "centre", "grup"];
-
         let isValid = true;
         let parsedData = {};
         let errors = [];
@@ -72,12 +76,14 @@ function ImportCSV() {
         if (!file) return;
 
         // Reinicia estadísticas y oculta resultados de guardado anterior
-        setStats({ created: 0, updated: 0, errors: 0 });
-        setShowSaveStats(false);
-        setErrorDetails([]);
-        setApiResponseMessage("");
-        setShowValidUsers(false);
-        setShowValidation(true);
+        setUiState({
+            showValidation: true,
+            showResults: false,
+            validationError: false,
+            showUserResults: false,
+            message: "",
+        });
+        setApiResults({});
 
         const reader = new FileReader();
         reader.onload = ({ target }) => {
@@ -111,9 +117,12 @@ function ImportCSV() {
             });
 
             setData(validatedData);
-            setRowResults(results);
-            setShowResults(true);
-            setHasValidationErrors(hasErrors);
+            setValidationResults(results);
+            setUiState((prev) => ({
+                ...prev,
+                showResults: true,
+                validationError: hasErrors,
+            }));
         };
         reader.readAsText(file);
     };
@@ -122,8 +131,11 @@ function ImportCSV() {
         if (data.length === 0) return;
 
         setIsProcessing(true);
-        setApiResponseMessage("Procesando usuarios...");
-        setShowValidation(false);
+        setUiState((prev) => ({
+            ...prev,
+            showValidation: false,
+            message: "Procesando usuarios...",
+        }));
 
         try {
             const response = await fetch("http://127.0.0.1:8000/import_users/", {
@@ -137,56 +149,54 @@ function ImportCSV() {
             const result = await response.json();
 
             if (response.ok) {
-                setStats({
-                    created: result.created,
-                    updated: result.updated,
-                    errors: result.errors || 0,
+                // Crear un objeto con los resultados por email
+                const userResults = {};
+
+                // Procesar errores si existen
+                if (result.error_details) {
+                    result.error_details.forEach((error) => {
+                        userResults[error.email] = {
+                            status: "error",
+                            message: error.error,
+                        };
+                    });
+                }
+
+                // Para los usuarios que no tienen errores
+                data.forEach((user) => {
+                    if (!userResults[user.email]) {
+                        userResults[user.email] = {
+                            status: "success",
+                            message: "Usuario creado correctamente",
+                        };
+                    }
                 });
 
-                // Guardar los detalles de errores si existen
-                if (result.error_details) {
-                    setErrorDetails(result.error_details);
+                setApiResults(userResults);
 
-                    // Crear un objeto con los resultados por email
-                    const results = {};
-                    result.error_details.forEach((error) => {
-                        results[error.email] = { status: "error", message: error.error };
-                    });
+                const message =
+                    result.errors === 0
+                        ? "Usuarios importados correctamente."
+                        : `Importación completada con ${result.errors} errores. Revisa los detalles.`;
 
-                    // Para los usuarios que no tienen errores, asumimos que fueron creados
-                    data.forEach((user) => {
-                        if (!results[user.email]) {
-                            results[user.email] = { status: "success", message: "Usuario creado correctamente" };
-                        }
-                    });
-
-                    setUserResults(results);
-                } else {
-                    // Si no hay errores, todos los usuarios fueron creados exitosamente
-                    const results = {};
-                    data.forEach((user) => {
-                        results[user.email] = { status: "success", message: "Usuario creado correctamente" };
-                    });
-                    setUserResults(results);
-                    setErrorDetails([]);
-                }
-
-                // Mostrar la sección de estadísticas y de usuarios válidos
-                setShowSaveStats(true);
-                setShowValidUsers(true);
-
-                if (result.errors === 0) {
-                    setApiResponseMessage("Usuarios importados correctamente.");
-                } else {
-                    setApiResponseMessage(`Importación completada con ${result.errors} errores. Revisa los detalles.`);
-                }
+                setUiState((prev) => ({
+                    ...prev,
+                    showUserResults: true,
+                    message,
+                }));
             } else {
-                setApiResponseMessage(`Error: ${result.error}`);
-                setShowValidation(true);
+                setUiState((prev) => ({
+                    ...prev,
+                    showValidation: true,
+                    message: `Error: ${result.error}`,
+                }));
             }
         } catch (error) {
-            setApiResponseMessage(`Error al conectar con el backend: ${error.message}`);
-            setShowValidation(true);
+            setUiState((prev) => ({
+                ...prev,
+                showValidation: true,
+                message: `Error al conectar con el backend: ${error.message}`,
+            }));
         } finally {
             setIsProcessing(false);
         }
@@ -197,25 +207,26 @@ function ImportCSV() {
             <h2>Importar Usuarios por CSV</h2>
             <p>Carga un fichero CSV para importar usuarios de manera automatizada.</p>
 
-            <div className={"CSV-actions"}>
+            <div className="CSV-actions">
                 <input type="file" accept=".csv" onChange={handleFileUpload} />
                 {data.length > 0 && (
                     <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
-                        {isProcessing ? "Guardando..." : "Guardar usuarios válidos"}
+                        {isProcessing ? "Guardando..." : "Importar"}
                     </button>
                 )}
             </div>
 
-            <div className={`API-response ${apiResponseMessage ? "visible" : "hidden"}`}>
-                <p className="API-response-messages">{apiResponseMessage}</p>
-            </div>
+            {uiState.message && (
+                <div className="API-response visible">
+                    <p className="API-response-messages">{uiState.message}</p>
+                </div>
+            )}
 
-            {showResults && showValidation && (
+            {uiState.showResults && uiState.showValidation && (
                 <div className="CSV-validation-results">
-                    <h3>Validación del CSV</h3>
-                    {hasValidationErrors ? (
+                    {uiState.validationError ? (
                         <ul className="validation-list">
-                            {rowResults
+                            {validationResults
                                 .filter((result) => !result.isValid)
                                 .map((result, index) => (
                                     <li key={index} className="invalid-row">
@@ -231,39 +242,45 @@ function ImportCSV() {
                                 ))}
                         </ul>
                     ) : (
-                        <p className="valid-format">El formato del CSV parece correcto</p>
+                        <p className="valid-format">
+                            El formato del CSV es correcto, pulse "Importar" para iniciar la subida de datos.
+                        </p>
                     )}
                 </div>
             )}
 
-            <div className={`CSV-show-results ${showValidUsers ? "visible" : "hidden"}`}>
-                <h3>Usuarios Válidos</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fila</th>
-                            {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
-                            <th>Resultado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.map((row, index) => (
-                            <tr key={index}>
-                                <td>{index + 1}</td>
-                                {Object.values(row).map((value, i) => (
-                                    <td key={i}>{value}</td>
-                                ))}
-                                <td
-                                    className={
-                                        userResults[row.email]?.status === "error" ? "error-message" : "success-message"
-                                    }>
-                                    {userResults[row.email]?.message || "-"}
-                                </td>
+            {uiState.showUserResults && (
+                <div className="CSV-show-results visible">
+                    <h3>Resultado Detallado</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fila</th>
+                                {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
+                                <th>Detalles</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {data.map((row, index) => (
+                                <tr key={index}>
+                                    <td>{index + 1}</td>
+                                    {Object.values(row).map((value, i) => (
+                                        <td key={i}>{value}</td>
+                                    ))}
+                                    <td
+                                        className={
+                                            apiResults[row.email]?.status === "error"
+                                                ? "error-message"
+                                                : "success-message"
+                                        }>
+                                        {apiResults[row.email]?.message || "-"}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </>
     );
 }
