@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CatalogSearch from './CatalogSearch';
 import CatalogItem from './CatalogItem';
+import "../styles/search.css";
 
 function CatalogSearchPage() {
   const [searchResults, setSearchResults] = useState([]);

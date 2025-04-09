@@ -1,12 +1,11 @@
-import React from "react";
-import "../styles/search.css";
+
 
 function CatalogItem({ item }) {
   // Determinar el tipo de ítem para mostrar información específica
 
   return (
     <div className="catalog-item">
-      <i class="fa-solid fa-arrow-up arrow"></i>
+      <i className="fa-solid fa-arrow-up arrow"></i>
       <p className="item-title">{item.titol}</p>
       {item.autor && <p className="informative-text item-author">{item.autor}</p>}
       <div className="badgeContainer">
