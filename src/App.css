@@ -25,7 +25,10 @@ body {
   font-size: var(--font-size-base);
   background-color: var(--whitesmoke);
   color: var(--black);
-  padding: 20px;
+}
+
+.container, .ImportCSV {
+  padding: var(--spacing-2xl);
 }
 
 .inputContainer {

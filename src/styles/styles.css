@@ -71,7 +71,6 @@
     font-size: var(--font-size-base);
     background-color: var(--whitesmoke);
     color: var(--black);
-    padding: var(--spacing-2xl);
   }
   
   .inputContainer {
