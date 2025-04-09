@@ -35,7 +35,7 @@ export default function Header() {
             </button>
           ) : (
             <button id="profile-button" onClick={togglePerfil}>
-              {isAdministrador ? "Perfil Administrador" : isBilbiotecari ? "Perfil Bibliotecari" : "Perfil Usuari"}
+              {isAdministrador ? "Perfil Administrador" : isBilbiotecari ? "Perfil Bibliotecario" : "Perfil Usuario"}
               </button>
           )}
         </div>

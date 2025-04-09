@@ -24,7 +24,7 @@ export default function Login() {
             },
         })
             .then((response) => {
-                if (!response.ok) throw new Error("Usuari o contrasenya incorrectes");
+                if (!response.ok) throw new Error("Usuario o contraseña incorrectos");
                 return response.json();
             })
             .then((data) => {
@@ -42,19 +42,19 @@ export default function Login() {
 
     return (
         <div id="login-container">
-            <h2>Login</h2>
+            <h3>Login</h3>
             <form onSubmit={(e) => { e.preventDefault(); setDoFetch(true); }}>
                 {error && <p style={{ color: "red", padding: "5px" }}>{error}</p>}
                 <div>
-                    <label>Usuari:</label>
+                    <label>Usuario:</label>
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
                 </div>
                 <div>
-                    <label>Contrasenya:</label>
+                    <label>Contraseña:</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 <button type="submit" disabled={isLoading}>
-                    {isLoading ? "Carregant..." : "Login"}
+                    {isLoading ? "Cargando..." : "Iniciar Sesión"}
                 </button>
             </form>
         </div>

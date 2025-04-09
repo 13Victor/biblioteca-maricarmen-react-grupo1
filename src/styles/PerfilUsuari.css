@@ -1,7 +1,31 @@
 #perfilUsuari-container{
     position: fixed;
     right: 0;
-    margin-right: 20px;
     width: 500px;
     background-color: lightgray;
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+#perfilUsuari-info{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+#perfilUsuari-info div{
+    padding: var(--spacing-sm);
+}
+
+#perfilUsuari-container button{
+    width: 100px;
+    margin: var(--spacing-sm);
+}
+
+#perfilUsuari-buttons-container{
+    display: flex;
+    flex-direction: row;
 }
