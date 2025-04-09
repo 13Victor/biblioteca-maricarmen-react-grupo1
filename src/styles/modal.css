@@ -1,0 +1,93 @@
+/* modal.css - Refactorizado */
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ===== MODAL CONTENEDOR ===== */
+.modal-content {
+  background: var(--color-white, white);
+  padding: 2rem;
+  border-radius: var(--border-radius-lg, 8px);
+  max-width: 1200px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* ===== BOTÓN CERRAR ===== */
+.modal-close {
+  position: absolute;
+  padding: 0;
+  right: var(--spacing-lg, 10px);
+  top: var(--spacing-md, 8px);
+  font-size: 1.5rem;
+  color: var(--color-darkblue, #350092);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background-color: transparent !important;
+}
+
+/* ===== ESTRUCTURA DEL MODAL ===== */
+.modal-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+/* ===== ELEMENTOS DEL MODAL ===== */
+.modal-info h2 {
+  margin-bottom: 1rem;
+}
+
+.modal-image img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: var(--border-radius-md, 4px);
+}
+
+.info-section {
+  margin-bottom: 1.5rem;
+}
+
+/* ===== TAGS ===== */
+.tags-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background: #e0e0e0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+}
+
+/* ===== MEDIA QUERIES ===== */
+@media (max-width: 768px) {
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-image {
+    text-align: center;
+  }
+}
