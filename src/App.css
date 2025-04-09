@@ -215,6 +215,7 @@ input[type="radio"]::before {
 
 input[type="radio"]:checked::before {
   transform: translate(-50%, -50%) scale(1);
+}
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
