@@ -1,0 +1,102 @@
+import { createContext, useState, useEffect } from "react";
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  // Estados para gestionar el usuario y el login
+  const [usuari, setUsuari] = useState(null);
+  const [isLogged, setIsLogged] = useState(false);
+  const [isBilbiotecari, setIsBilbiotecari] = useState(false);
+  const [isAdministrador, setIsAdministrador] = useState(false);
+  const [errorProfile, setErrorProfile] = useState(null);
+
+  // Estado para controlar la visibilidad del perfil
+  const [mostrarPerfil, setMostrarPerfil] = useState(false);
+
+  // Estado para controlar la visibilidad del login
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+
+  // Función para cerrar sesión
+  const handleLogOut = () => {
+    sessionStorage.removeItem("token");
+    setUsuari(null);
+    setIsLogged(false);
+    setIsAdministrador(false);
+    setIsBilbiotecari(false);
+    setMostrarPerfil(false);
+    setMostrarLogin(false);
+  };
+
+  // Comprobar si hay un token y actualizar el estado
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      setIsLogged(true);
+    }
+  }, []);
+
+  // Comprobar si el usuario es bibliotecario o administrador
+  useEffect(() => {
+    if (usuari) {
+      setIsAdministrador(usuari.is_superuser);
+      setIsBilbiotecari(usuari.is_staff);
+    }
+  }, [usuari]);
+
+  // Fetch de datos de usuario
+  useEffect(() => {
+    if (!isLogged) return;
+    const timeout = setTimeout(() => {
+      const token = sessionStorage.getItem("token");
+
+      if (!token) {
+        setErrorProfile("No s'ha trobat cap usuari. Si us plau, inicia sessió.");
+        return;
+      }
+
+      fetch("http://localhost:8000/api/usuari/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error en la solicitud: " + response.status);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setUsuari(data);
+        })
+        .catch((error) => {
+          console.error("Error al obtenir les dades:", error);
+          setErrorProfile("Error al obtenir les dades");
+        });
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [isLogged]);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        usuari,
+        setUsuari,
+        isLogged,
+        setIsLogged,
+        isBilbiotecari,
+        isAdministrador,
+        errorProfile,
+        setErrorProfile,
+        mostrarPerfil,
+        setMostrarPerfil,
+        mostrarLogin,
+        setMostrarLogin,
+        handleLogOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
