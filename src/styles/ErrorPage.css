@@ -1,0 +1,201 @@
+:root {
+    /* Colores principales */
+    --black: #232323;
+    --grey: #7e7e7e;
+    --grey-light: #f0f0f0;
+    --grey-lighter: #f5f5f5;
+    --grey-dark: #666666;
+    --darkblue: #350092;
+    --darkblue-accent: #4e16ad;
+    --blue: #90a2c7;
+    --lightblue: #dddbf1;
+    --whitesmoke: #fafafa;
+    --white: #ffffff;
+
+    /* Estados específicos */
+    --success-bg: #d4edda;
+    --success-color: #155724;
+    --warning-bg: #fff3cd;
+    --warning-color: #856404;
+    --danger-bg: #f8d7da;
+    --danger-color: #721c24;
+    --disabled-bg: #cccccc;
+
+    /* Tipografía */
+    --font-family: "Inter", sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-md: 18px;
+    --font-size-lg: 20px;
+    --font-size-xl: 24px;
+    --font-size-2xl: 28px;
+    --font-size-3xl: 32px;
+
+    /* Espaciados */
+    --spacing-xs: 3px;
+    --spacing-sm: 5px;
+    --spacing-md: 8px;
+    --spacing-lg: 10px;
+    --spacing-2lg: 13px;
+    --spacing-xl: 15px;
+    --spacing-2xl: 20px;
+    --spacing-3xl: 30px;
+
+    /* Bordes y sombras */
+    --border-radius-sm: 2px;
+    --border-radius-md: 5px;
+    --border-radius-lg: 8px;
+    --border-radius-xl: 20px;
+    --box-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --box-shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --box-shadow-lg: 0 5px 15px rgba(0, 0, 0, 0.15);
+    --border-width: 1px;
+    --border-width-md: 2px;
+
+    /* Transiciones */
+    --transition-speed: 0.2s;
+    --transition-speed-md: 0.3s;
+}
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Cuerpo */
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    background-color: var(--grey-lighter);
+    color: var(--black);
+}
+
+/* Títulos básicos necesarios para la página de error */
+h1,
+h2 {
+    font-family: var(--font-family);
+    font-weight: 700;
+}
+
+/* Botones - solo lo necesario para el botón de volver */
+button {
+    background-color: var(--darkblue);
+    color: var(--white);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-speed-md);
+}
+
+button:hover {
+    background-color: var(--darkblue-accent);
+}
+
+button:focus-visible {
+    outline: var(--border-width-md) solid var(--blue);
+    outline-offset: var(--border-width-md);
+}
+
+/* Contenedor de error */
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: var(--spacing-3xl);
+}
+
+.error-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 700px;
+    min-height: 400px;
+    padding: var(--spacing-3xl);
+    background-color: var(--white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow-md);
+    text-align: center;
+}
+
+.error-title {
+    margin-bottom: var(--spacing-xl);
+    color: var(--danger-color);
+    background-color: var(--danger-bg);
+    padding: var(--spacing-lg) var(--spacing-3xl);
+    border-radius: var(--border-radius-md);
+    width: 100%;
+}
+
+.error-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 180px;
+    height: 180px;
+    margin: var(--spacing-2xl) 0;
+    border-radius: 50%;
+    background-color: var(--lightblue);
+    position: relative;
+}
+
+.error-image span {
+    font-size: 80px;
+    font-weight: 700;
+    color: var(--darkblue);
+}
+
+.error-subtitle {
+    color: var(--darkblue);
+    margin-bottom: var(--spacing-xl);
+    background-color: transparent;
+    padding: 0;
+}
+
+.error-message {
+    color: var(--grey-dark);
+    margin-bottom: var(--spacing-2xl);
+    font-size: var(--font-size-md);
+}
+
+.error-button {
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    font-weight: 600;
+    border-radius: var(--border-radius-xl);
+    transition: transform var(--transition-speed) ease-in-out,
+        background-color var(--transition-speed-md);
+}
+
+.error-button:hover {
+    transform: scale(1.05);
+}
+
+.error-button:active {
+    transform: scale(0.98);
+}
+
+/* Responsive para dispositivos móviles */
+@media (max-width: 768px) {
+    .error-container {
+        padding: var(--spacing-xl);
+    }
+
+    .error-content {
+        padding: var(--spacing-2xl);
+    }
+
+    .error-image {
+        width: 150px;
+        height: 150px;
+    }
+
+    .error-image span {
+        font-size: 60px;
+    }
+}
