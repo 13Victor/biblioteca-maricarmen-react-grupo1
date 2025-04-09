@@ -18,10 +18,6 @@
   position: relative;
 }
 
-.search-button {
-  padding-block: var(--spacing-2lg) !important;
-}
-
 .search-button:disabled {
   background-color: var(--disabled-bg);
   cursor: not-allowed;

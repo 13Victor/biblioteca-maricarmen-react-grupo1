@@ -1,0 +1,17 @@
+#header-container{
+    background-color: var(--darkblue);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+}
+
+#header-container h1{
+    color: white;
+}
+
+#header-buttons{
+    display: flex;
+    flex-direction: row;
+}
+

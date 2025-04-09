@@ -1,0 +1,19 @@
+#login-container{
+    position: fixed;
+    right: 0;
+    margin-right: 20px;
+    width: 500px;
+    background-color: lightgray;
+}
+
+#login-container form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+#login-container form button{
+    margin-top: 10px;
+}
