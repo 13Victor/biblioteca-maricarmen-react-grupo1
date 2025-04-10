@@ -1,5 +1,7 @@
 import { useState } from "react";
 import BookModal from "./BookModal";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 
 function CatalogItem({ item }) {
   const [showModal, setShowModal] = useState(false);
@@ -13,21 +15,29 @@ function CatalogItem({ item }) {
       <div className="catalog-item" onClick={() => setShowModal(true)}>
         <i className="fa-solid fa-arrow-up arrow"></i>
         <p className="item-title">{item.titol}</p>
-        {item.autor && <p className="informative-text item-author">{item.autor}</p>}
+        {item.tipus === "dispositiu"
+          ? item.marca && <p className="informative-text item-author">{item.marca}</p>
+          : item.autor && <p className="informative-text item-author">{item.autor}</p>}
         <div className="badgeContainer">
-          <span className="badge item-type-badge">{item.tipus === "llibre" ? "Libro" : ""}</span>
+          <span className="badge item-type-badge">{item.tipus}</span>
 
-          {/* Mostrar contadores de ejemplares por estado */}
+          {/* Mostrar contadores de ejemplares por estado con tooltips */}
           {hasExemplarCounts ? (
             <div className="exemplar-status-container">
               {item.exemplar_counts.disponible > 0 && (
-                <span className="badge item-status available">{item.exemplar_counts.disponible}</span>
+                <Tippy content="Disponible" placement="top">
+                  <span className="badge item-status available">{item.exemplar_counts.disponible}</span>
+                </Tippy>
               )}
               {item.exemplar_counts.exclos_prestec > 0 && (
-                <span className="badge item-status excluded">{item.exemplar_counts.exclos_prestec}</span>
+                <Tippy content="Excluido de préstamo" placement="top">
+                  <span className="badge item-status excluded">{item.exemplar_counts.exclos_prestec}</span>
+                </Tippy>
               )}
               {item.exemplar_counts.baixa > 0 && (
-                <span className="badge item-status baixa">{item.exemplar_counts.baixa}</span>
+                <Tippy content="De baja" placement="top">
+                  <span className="badge item-status baixa">{item.exemplar_counts.baixa}</span>
+                </Tippy>
               )}
             </div>
           ) : (

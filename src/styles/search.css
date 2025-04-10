@@ -82,6 +82,7 @@
 
 /* ===== ITEMS DEL CATÁLOGO ===== */
 .catalog-item {
+  justify-content: space-between;
   position: relative;
   background: var(--color-white, white);
   border-radius: var(--border-radius-lg);
