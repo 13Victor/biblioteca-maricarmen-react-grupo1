@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./ImportCSV.css";
+import "../styles/ImportCSV.css";
 
 function ImportCSV() {
     // Estado principal para datos y validación
