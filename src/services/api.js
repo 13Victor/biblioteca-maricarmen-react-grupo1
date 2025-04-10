@@ -1,6 +1,6 @@
 // API base URL - ajusta según tu configuración
-//const API_BASE_URL = "http://localhost:8000/api";
-const API_BASE_URL = "https://biblioteca1.ieti.site/api";
+const API_BASE_URL = "http://localhost:8000/api";
+// const API_BASE_URL = "https://biblioteca1.ieti.site/api";
 
 // Función para obtener libros
 export const getBooks = async () => {

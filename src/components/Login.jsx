@@ -15,7 +15,7 @@ export default function Login() {
 
         setIsLoading(true);
         setError(null);
-        fetch("https://biblioteca1.ieti.site/api/token/", {
+        fetch("http://localhost:8000/api/token/", {
             method: "GET",
             headers: {
                 "Authorization": `Basic ${btoa(username + ":" + password)}`,

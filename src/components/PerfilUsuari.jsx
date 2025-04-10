@@ -62,7 +62,7 @@ export default function PerfilUsuari() {
           usuari.imatge = updatedUser.imatge;
         }
         setIsEditing(false);
-        alert("Usuario actualizado correctamente.");
+        // alert("Usuario actualizado correctamente.");
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
@@ -82,7 +82,7 @@ export default function PerfilUsuari() {
         <div><strong>Nombre: </strong>{isEditing ? <input type="text" name="first_name" value={editedData.first_name} onChange={handleInputChange} /> : usuari.first_name}</div>
         <div><strong>Apellido: </strong>{isEditing ? <input type="text" name="last_name" value={editedData.last_name} onChange={handleInputChange} /> : usuari.last_name}</div>
         <div><strong>Email: </strong>{isEditing ? <input type="email" name="email" value={editedData.email} onChange={handleInputChange} /> : usuari.email}</div>
-        <div><strong>Imagen: </strong>{isEditing ? <input type="file" name="imatge" accept="image/*" onChange={handleImageChange} /> : (usuari.imatge && <img src={`../../${usuari.imatge}`} alt="Imagen de perfil" width="100" />)}</div>
+        <div><strong>Imagen: </strong>{isEditing ? <input type="file" name="imatge" accept="image/*" onChange={handleImageChange} /> : (usuari.imatge && <img src={`../..${usuari.imatge}`} alt="Imagen de perfil" width="100" />)}</div>
         <div><strong>Centro: </strong>{usuari.centre}</div>
         <div><strong>Ciclo: </strong>{usuari.cicle}</div>
         <div><strong>Rol: </strong>{usuari.is_staff && usuari.is_superuser ? "Administrador" : usuari.is_staff ? "Bibliotecario" : "Usuario"}</div>
