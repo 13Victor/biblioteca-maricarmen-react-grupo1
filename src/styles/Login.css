@@ -2,9 +2,11 @@
     position: fixed;
     right: 0;
     width: 500px;
-    background-color: lightgray;
+    background-color: var( --grey-lighter);
     padding: var(--spacing-lg);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius-lg);
+    z-index: 9000;
 }
 
 #login-container form{

@@ -42,7 +42,7 @@ export default function Login() {
 
     return (
         <div id="login-container">
-            <h3>Login</h3>
+            <h1>Login</h1>
             <form onSubmit={(e) => { e.preventDefault(); setDoFetch(true); }}>
                 {error && <p style={{ color: "red", padding: "5px" }}>{error}</p>}
                 <div>
