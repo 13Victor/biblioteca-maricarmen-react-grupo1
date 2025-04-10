@@ -1,4 +1,10 @@
-/* Estilos específicos para el componente de búsqueda */
+/* search.css - Refactorizado */
+
+/* ===== COMPONENTE DE BÚSQUEDA ===== */
+.search-container {
+  margin: var(--spacing-3xl) 0;
+}
+
 .search-form {
   display: flex;
   width: 100%;
@@ -8,10 +14,6 @@
   height: fit-content;
 }
 
-.search-container {
-  margin: var(--spacing-3xl) 0;
-}
-
 .search-input-container {
   width: 100%;
   max-width: 600px;
@@ -19,11 +21,11 @@
 }
 
 .search-button:disabled {
-  background-color: var(--disabled-bg);
+  background-color: var(--state-disabled-bg, #cccccc);
   cursor: not-allowed;
 }
 
-/* Lista de sugerencias */
+/* ===== LISTA DE SUGERENCIAS ===== */
 .suggestions-list {
   position: absolute;
   top: 100%;
@@ -31,8 +33,8 @@
   width: 100%;
   max-height: 300px;
   overflow-y: auto;
-  background-color: var(--white);
-  border: var(--border-width) solid var(--grey-light);
+  background-color: var(--color-white, white);
+  border: var(--border-width) solid var(--color-grey-light, #f0f0f0);
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
   box-shadow: var(--box-shadow-sm);
   z-index: 10;
@@ -42,7 +44,7 @@
 .suggestion-item {
   padding: var(--spacing-lg) var(--spacing-xl);
   cursor: pointer;
-  border-bottom: var(--border-width) solid var(--grey-light);
+  border-bottom: var(--border-width) solid var(--color-grey-light, #f0f0f0);
   transition: background-color var(--transition-speed);
 }
 
@@ -51,14 +53,14 @@
 }
 
 .suggestion-item:hover {
-  background-color: var(--grey-lighter);
+  background-color: var(--color-grey-lighter, #f5f5f5);
 }
 
 .suggestion-title {
   font-weight: bold;
 }
 
-/* Grid de resultados */
+/* ===== GRID DE RESULTADOS ===== */
 .search-results-container {
   margin-top: var(--spacing-3xl);
 }
@@ -70,9 +72,18 @@
   margin-top: var(--spacing-2xl);
 }
 
+.no-results {
+  text-align: center;
+  padding: var(--spacing-3xl);
+  background: var(--color-white, white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-md);
+}
+
+/* ===== ITEMS DEL CATÁLOGO ===== */
 .catalog-item {
   position: relative;
-  background: var(--white);
+  background: var(--color-white, white);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-md);
   padding: var(--spacing-2xl);
@@ -89,39 +100,15 @@
 
 .item-title {
   margin-top: 0;
-  color: var(--black);
+  color: var(--color-black, #232323);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .item-author {
-  color: var(--grey-dark);
+  color: var(--color-grey-dark, #666666);
   margin: var(--spacing-sm) 0 var(--spacing-xl);
-}
-
-.item-type-badge, .item-status  {
-  background-color: var(--grey-light);
-  color: var(--grey-dark);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--border-radius-sm);
-  text-transform: capitalize;
-  font-weight: bold;
-}
-
-.item-status.available {
-  background-color: var(--success-bg);
-  color: var(--success-color);
-}
-
-.item-status.excluded {
-  background-color: var(--warning-bg);
-  color: var(--warning-color);
-}
-
-.item-status.baixa {
-  background-color: var(--danger-bg);
-  color: var(--danger-color);
 }
 
 .badgeContainer {
@@ -130,20 +117,86 @@
   align-items: flex-end;
 }
 
-.no-results {
-  text-align: center;
-  padding: var(--spacing-3xl);
-  background: var(--white);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-md);
-}
-
 .arrow {
   position: absolute;
   padding: var(--spacing-lg);
-  color: var(--grey-dark);
+  color: var(--color-grey-dark, #666666);
   top: 0;
   right: 0;
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+/* ===== BADGES Y ESTADOS ===== */
+.item-type-badge,
+.item-status,
+.badge.item-status {
+  background-color: var(--color-grey-light, #f0f0f0);
+  color: var(--color-grey-dark, #666666);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  text-transform: capitalize;
+  font-weight: bold;
+  font-size: 0.8rem;
+  display: inline-block;
+}
+
+/* Estados de disponibilidad */
+.item-status.available,
+.badge.item-status.available {
+  background-color: var(--state-success-bg, #d4edda);
+  color: var(--state-success-color, #155724);
+}
+
+.item-status.excluded,
+.badge.item-status.excluded {
+  background-color: var(--state-warning-bg, #fff3cd);
+  color: var(--state-warning-color, #856404);
+}
+
+.item-status.baixa,
+.badge.item-status.baixa {
+  background-color: var(--state-danger-bg, #f8d7da);
+  color: var(--state-danger-color, #721c24);
+}
+
+/* ===== CONTADORES DE EJEMPLARES ===== */
+.exemplar-status-container {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.exemplar-availability {
+  background-color: var(--color-grey-lighter, #f5f5f5);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ===== SECCIÓN DE EJEMPLARES EN MODAL ===== */
+.ejemplares-estado ul {
+  list-style: none;
+  margin-top: var(--spacing-md);
+}
+
+.ejemplares-estado li {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.ejemplares-estado .count {
+  margin-left: var(--spacing-lg);
+}
+
+.ejemplares-estado .badge {
+  min-width: 150px;
+  text-align: center;
+}
+
+.total-exemplares {
+  margin-top: var(--spacing-lg);
+  font-weight: bold;
+  border-top: var(--border-width) solid var(--color-grey-light, #f0f0f0);
+  padding-top: var(--spacing-md);
 }
