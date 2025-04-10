@@ -4,6 +4,7 @@ import Header from './components/Header';
 import { AuthProvider } from "./context/AuthContext";
 import "./styles/styles.css";
 import ModoAdminCSV from './components/ModoAdminCSV';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Header />
       <ModoAdminCSV />
       <CatalogSearchPage />
+      <Footer />
     </div>
     </AuthProvider>
   );
