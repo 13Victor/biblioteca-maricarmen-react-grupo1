@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }) => {
         setErrorProfile("No s'ha trobat cap usuari. Si us plau, inicia sessió.");
         return;
       }
-
       fetch("http://localhost:8000/api/usuari/", {
         method: "GET",
         headers: {

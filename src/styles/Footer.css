@@ -1,0 +1,31 @@
+.footer {
+    background-color: var(--darkblue);
+    padding: 1rem 0;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .gif-container {
+    width: 600px;
+    height: 160px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .gif-container img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }

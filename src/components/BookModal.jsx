@@ -6,22 +6,80 @@ function BookModal({ book, onClose }) {
 
   // Format date safely
   const formatDate = (dateString) => {
-    if (!dateString) return "No disponible";
+    if (!dateString) return null;
     const date = new Date(dateString);
-    return !isNaN(date.getTime()) ? date.toLocaleDateString() : "No disponible";
+    return !isNaN(date.getTime()) ? date.toLocaleDateString() : null;
   };
 
-  // Safe access to nested properties
-  const getNestedValue = (obj, path, defaultValue = "No disponible") => {
-    if (!obj) return defaultValue;
+  // Safe access to nested properties with null instead of default value
+  const getNestedValue = (obj, path) => {
+    if (!obj) return null;
     const value = path.split(".").reduce((o, key) => (o && o[key] !== undefined ? o[key] : undefined), obj);
-    return value !== undefined && value !== null ? value : defaultValue;
+    return value !== undefined && value !== null ? value : null;
+  };
+
+  // Crear un componente de presentación para los campos condicionales
+  const InfoField = ({ label, value }) => {
+    if (value === null || value === undefined || value === "") return null;
+    return (
+      <p>
+        <strong>{label}:</strong> {value}
+      </p>
+    );
   };
 
   // Verificar si tenemos datos de conteo de ejemplares
   const hasExemplarCounts =
     book.exemplar_counts &&
     (book.exemplar_counts.disponible > 0 || book.exemplar_counts.exclos_prestec > 0 || book.exemplar_counts.baixa > 0);
+
+  // Determinar qué información específica mostrar según el tipo
+  const renderTypeSpecificInfo = () => {
+    switch (book.tipus) {
+      case "llibre":
+        return (
+          <>
+            <InfoField label="Editorial" value={book.editorial} />
+            <InfoField label="Colección" value={book.colleccio} />
+            <InfoField label="ISBN" value={book.ISBN} />
+            <InfoField label="Páginas" value={book.pagines} />
+          </>
+        );
+      case "revista":
+        return (
+          <>
+            <InfoField label="Editorial" value={book.editorial} />
+            <InfoField label="ISSN" value={book.ISSN} />
+            <InfoField label="Páginas" value={book.pagines} />
+          </>
+        );
+      case "cd":
+        return (
+          <>
+            <InfoField label="Discográfica" value={book.discografica} />
+            <InfoField label="Estilo" value={book.estil} />
+            <InfoField label="Duración" value={book.duracio} />
+          </>
+        );
+      case "dvd":
+      case "br":
+        return (
+          <>
+            <InfoField label="Productora" value={book.productora} />
+            <InfoField label="Duración" value={book.duracio} />
+          </>
+        );
+      case "dispositiu":
+        return (
+          <>
+            <InfoField label="Marca" value={book.marca} />
+            <InfoField label="Modelo" value={book.model} />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -44,9 +102,9 @@ function BookModal({ book, onClose }) {
             {book.titol_original && <p className="original-title">Título original: {book.titol_original}</p>}
 
             {/* Sección de disponibilidad de ejemplares */}
-            <div className="info-section exemplar-availability">
-              <h3>Ejemplares disponibles</h3>
-              {hasExemplarCounts ? (
+            {hasExemplarCounts && (
+              <div className="info-section exemplar-availability">
+                <h3>Ejemplares disponibles</h3>
                 <div className="ejemplares-estado">
                   <ul>
                     {book.exemplar_counts.disponible > 0 && (
@@ -74,57 +132,27 @@ function BookModal({ book, onClose }) {
                     ejemplares
                   </p>
                 </div>
-              ) : (
-                <p>Información de ejemplares no disponible</p>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="info-section">
               <h3>Información General</h3>
-              <p>
-                <strong>Autor:</strong> {getNestedValue(book, "autor")}
-              </p>
-              <p>
-                <strong>Editorial:</strong> {getNestedValue(book, "editorial")}
-              </p>
-              {book.colleccio && (
-                <p>
-                  <strong>Colección:</strong> {book.colleccio}
-                </p>
-              )}
-              <p>
-                <strong>ISBN:</strong> {getNestedValue(book, "ISBN")}
-              </p>
-              <p>
-                <strong>Fecha de edición:</strong> {formatDate(book.data_edicio)}
-              </p>
-              <p>
-                <strong>Páginas:</strong> {getNestedValue(book, "pagines")}
-              </p>
-              {book.mides && (
-                <p>
-                  <strong>Dimensiones:</strong> {book.mides}
-                </p>
-              )}
+              <InfoField label="Autor" value={book.autor} />
+
+              {/* Renderizar campos específicos según el tipo */}
+              {renderTypeSpecificInfo()}
+
+              <InfoField label="Fecha de edición" value={formatDate(book.data_edicio)} />
+              <InfoField label="Dimensiones" value={book.mides} />
             </div>
 
             <div className="info-section">
               <h3>Ubicación y Clasificación</h3>
-              <p>
-                <strong>CDU:</strong> {getNestedValue(book, "CDU")}
-              </p>
-              <p>
-                <strong>Signatura:</strong> {getNestedValue(book, "signatura")}
-              </p>
-              <p>
-                <strong>País:</strong> {getNestedValue(book, "pais.nom")}
-              </p>
-              <p>
-                <strong>Lengua:</strong> {getNestedValue(book, "llengua.nom")}
-              </p>
-              <p>
-                <strong>Lugar:</strong> {getNestedValue(book, "lloc")}
-              </p>
+              <InfoField label="CDU" value={book.CDU} />
+              <InfoField label="Signatura" value={book.signatura} />
+              <InfoField label="País" value={getNestedValue(book, "pais.nom")} />
+              <InfoField label="Lengua" value={getNestedValue(book, "llengua.nom")} />
+              <InfoField label="Lugar" value={book.lloc} />
             </div>
 
             {book.resum && (
@@ -141,15 +169,15 @@ function BookModal({ book, onClose }) {
               </div>
             )}
 
-            <div className="tags-section">
-              {book.tags &&
-                book.tags.length > 0 &&
-                book.tags.map((tag) => (
+            {book.tags && book.tags.length > 0 && (
+              <div className="tags-section">
+                {book.tags.map((tag) => (
                   <span key={tag.id} className="tag">
                     {tag.nom}
                   </span>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
