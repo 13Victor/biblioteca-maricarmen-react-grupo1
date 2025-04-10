@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
         setErrorProfile("No s'ha trobat cap usuari. Si us plau, inicia sessió.");
         return;
       }
-      fetch("https://biblioteca1.ieti.site/api/usuari/", {
+      fetch("http://localhost:8000/api/usuari/", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
