@@ -15,8 +15,7 @@ export default function Login() {
 
         setIsLoading(true);
         setError(null);
-
-        fetch("http://localhost:8000/api/token/", {
+        fetch("https://biblioteca1.ieti.site/api/token/", {
             method: "GET",
             headers: {
                 "Authorization": `Basic ${btoa(username + ":" + password)}`,
@@ -42,7 +41,7 @@ export default function Login() {
 
     return (
         <div id="login-container">
-            <h3>Login</h3>
+            <h1>Login</h1>
             <form onSubmit={(e) => { e.preventDefault(); setDoFetch(true); }}>
                 {error && <p style={{ color: "red", padding: "5px" }}>{error}</p>}
                 <div>

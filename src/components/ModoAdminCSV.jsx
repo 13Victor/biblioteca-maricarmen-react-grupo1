@@ -11,8 +11,6 @@ export default function ModoAdminCSV() {
         return null;
     }
     return(
-        <div className="ImportCSV">
           <ImportCSV />
-        </div>
     )
 }

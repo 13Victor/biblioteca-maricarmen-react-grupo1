@@ -28,7 +28,7 @@ export default function Header() {
       <div id="header-container">
         <h1>Biblioteca Maricarmen</h1>
         <div id="header-buttons">
-          {isBilbiotecari && <button>Admin Panel</button>}
+          {isBilbiotecari && <button onClick={() => window.location.href = "https://biblioteca1.ieti.site/admin"}>Admin Panel</button>}
           {!isLogged ? (
             <button id="login-button" onClick={toggleLogin}>
               Login

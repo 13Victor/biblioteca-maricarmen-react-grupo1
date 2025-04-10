@@ -77,7 +77,7 @@ export default function PerfilUsuari() {
 
   return (
     <div id="perfilUsuari-container">
-      <h3>{usuari.username}</h3>
+      <h2>{usuari.username}</h2>
       <div id="perfilUsuari-info">
         <div><strong>Nombre: </strong>{isEditing ? <input type="text" name="first_name" value={editedData.first_name} onChange={handleInputChange} /> : usuari.first_name}</div>
         <div><strong>Apellido: </strong>{isEditing ? <input type="text" name="last_name" value={editedData.last_name} onChange={handleInputChange} /> : usuari.last_name}</div>
