@@ -40,9 +40,9 @@ function BookModal({ book, onClose }) {
         return (
           <>
             <InfoField label="Editorial" value={book.editorial} />
-            <InfoField label="Colección" value={book.colleccio} />
+            <InfoField label="Colecció" value={book.colleccio} />
             <InfoField label="ISBN" value={book.ISBN} />
-            <InfoField label="Páginas" value={book.pagines} />
+            <InfoField label="Pàgines" value={book.pagines} />
           </>
         );
       case "revista":
@@ -50,15 +50,15 @@ function BookModal({ book, onClose }) {
           <>
             <InfoField label="Editorial" value={book.editorial} />
             <InfoField label="ISSN" value={book.ISSN} />
-            <InfoField label="Páginas" value={book.pagines} />
+            <InfoField label="Pàgines" value={book.pagines} />
           </>
         );
       case "cd":
         return (
           <>
-            <InfoField label="Discográfica" value={book.discografica} />
-            <InfoField label="Estilo" value={book.estil} />
-            <InfoField label="Duración" value={book.duracio} />
+            <InfoField label="Discogràfica" value={book.discografica} />
+            <InfoField label="Estil" value={book.estil} />
+            <InfoField label="Duració" value={book.duracio} />
           </>
         );
       case "dvd":
@@ -66,14 +66,14 @@ function BookModal({ book, onClose }) {
         return (
           <>
             <InfoField label="Productora" value={book.productora} />
-            <InfoField label="Duración" value={book.duracio} />
+            <InfoField label="Durada" value={book.duracio} />
           </>
         );
       case "dispositiu":
         return (
           <>
             <InfoField label="Marca" value={book.marca} />
-            <InfoField label="Modelo" value={book.model} />
+            <InfoField label="Model" value={book.model} />
           </>
         );
       default:
@@ -99,72 +99,72 @@ function BookModal({ book, onClose }) {
 
           <div className="modal-info">
             <h2>{book.titol}</h2>
-            {book.titol_original && <p className="original-title">Título original: {book.titol_original}</p>}
+            {book.titol_original && <p className="original-title">Títol original: {book.titol_original}</p>}
 
             {/* Sección de disponibilidad de ejemplares */}
             {hasExemplarCounts && (
               <div className="info-section exemplar-availability">
-                <h3>Ejemplares disponibles</h3>
+                <h3>Exemplars disponibles</h3>
                 <div className="ejemplares-estado">
                   <ul>
                     {book.exemplar_counts.disponible > 0 && (
                       <li>
                         <span className="badge item-status available">Disponible</span>
-                        <span className="count">{book.exemplar_counts.disponible} ejemplares</span>
+                        <span className="count">{book.exemplar_counts.disponible} exemplars</span>
                       </li>
                     )}
                     {book.exemplar_counts.exclos_prestec > 0 && (
                       <li>
-                        <span className="badge item-status excluded">No disponible para préstamo</span>
-                        <span className="count">{book.exemplar_counts.exclos_prestec} ejemplares</span>
+                        <span className="badge item-status excluded">No disponible par préstec</span>
+                        <span className="count">{book.exemplar_counts.exclos_prestec} exemplars</span>
                       </li>
                     )}
                     {book.exemplar_counts.baixa > 0 && (
                       <li>
-                        <span className="badge item-status baixa">De baja</span>
-                        <span className="count">{book.exemplar_counts.baixa} ejemplares</span>
+                        <span className="badge item-status baixa">De baixa</span>
+                        <span className="count">{book.exemplar_counts.baixa} exemplars</span>
                       </li>
                     )}
                   </ul>
                   <p className="total-exemplares">
                     Total:{" "}
                     {book.exemplar_counts.disponible + book.exemplar_counts.exclos_prestec + book.exemplar_counts.baixa}{" "}
-                    ejemplares
+                    exemplars
                   </p>
                 </div>
               </div>
             )}
 
             <div className="info-section">
-              <h3>Información General</h3>
+              <h3>Informació General</h3>
               <InfoField label="Autor" value={book.autor} />
 
               {/* Renderizar campos específicos según el tipo */}
               {renderTypeSpecificInfo()}
 
-              <InfoField label="Fecha de edición" value={formatDate(book.data_edicio)} />
-              <InfoField label="Dimensiones" value={book.mides} />
+              <InfoField label="Data d'edició" value={formatDate(book.data_edicio)} />
+              <InfoField label="Dimensions" value={book.mides} />
             </div>
 
             <div className="info-section">
-              <h3>Ubicación y Clasificación</h3>
+              <h3>Ubicació i Classificació</h3>
               <InfoField label="CDU" value={book.CDU} />
               <InfoField label="Signatura" value={book.signatura} />
               <InfoField label="País" value={getNestedValue(book, "pais.nom")} />
-              <InfoField label="Lengua" value={getNestedValue(book, "llengua.nom")} />
-              <InfoField label="Lugar" value={book.lloc} />
+              <InfoField label="Llengua" value={getNestedValue(book, "llengua.nom")} />
+              <InfoField label="Lloc" value={book.lloc} />
             </div>
 
             {book.resum && (
               <div className="info-section">
-                <h3>Resumen</h3>
+                <h3>Resum</h3>
                 <p>{book.resum}</p>
               </div>
             )}
 
             {book.anotacions && (
               <div className="info-section">
-                <h3>Anotaciones</h3>
+                <h3>Anotacions</h3>
                 <p>{book.anotacions}</p>
               </div>
             )}

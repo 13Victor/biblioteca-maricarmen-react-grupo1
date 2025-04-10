@@ -20,7 +20,7 @@ function CatalogSearchPage() {
 
   return (
     <div className="container">
-      <h2>Catálogo de la Biblioteca</h2>
+      <h2>Catàleg de la Biblioteca</h2>
       
       <CatalogSearch onSearchResults={handleSearchResults} />
       
@@ -28,8 +28,8 @@ function CatalogSearchPage() {
         <div className="search-results-container">
           <h3>
             {isInitialLoad 
-              ? `Catálogo completo (${searchResults.length})` 
-              : `Resultados de la búsqueda (${searchResults.length})`
+              ? `Catàleg complet (${searchResults.length})` 
+              : `Resultats de la cerca (${searchResults.length})`
             }
           </h3>
           
@@ -41,7 +41,7 @@ function CatalogSearchPage() {
             </div>
           ) : (
             <div className="no-results">
-              <p>No se encontraron resultados para esta búsqueda.</p>
+              <p>No s'han trobat resultats per aquesta cerca.</p>
             </div>
           )}
         </div>

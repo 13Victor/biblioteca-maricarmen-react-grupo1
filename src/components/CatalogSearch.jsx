@@ -20,7 +20,7 @@ function CatalogSearch({ onSearchResults }) {
         const results = await searchCatalog('');
         onSearchResults(results, false); // false indica que NO es una búsqueda del usuario
       } catch (error) {
-        console.error('Error al cargar resultados iniciales:', error);
+        console.error('Error al carregar resultats inicials:', error);
         onSearchResults([], false);
       } finally {
         setIsLoading(false);
@@ -49,7 +49,7 @@ function CatalogSearch({ onSearchResults }) {
         const data = await searchSuggestions(debouncedSearchQuery);
         setSuggestions(data);
       } catch (error) {
-        console.error('Error al obtener sugerencias:', error);
+        console.error('Error al obtindre suggerències:', error);
       } finally {
         setIsLoading(false);
       }
@@ -97,7 +97,7 @@ function CatalogSearch({ onSearchResults }) {
       const isUserInitiatedSearch = trimmedQuery !== '';
       onSearchResults(results, isUserInitiatedSearch);
     } catch (error) {
-      console.error('Error en la búsqueda:', error);
+      console.error('Error en la cerca:', error);
       onSearchResults([], trimmedQuery !== '');
     } finally {
       setIsLoading(false);
@@ -120,7 +120,7 @@ function CatalogSearch({ onSearchResults }) {
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => searchQuery.trim() !== '' && setShowSuggestions(true)}
-            placeholder="Buscar en el catálogo..."
+            placeholder="Cercar en el catàleg..."
             className="search-input"
           />
           
