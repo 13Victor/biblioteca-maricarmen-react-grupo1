@@ -11,8 +11,10 @@ function App() {
     <AuthProvider>
       <div className="App">
         <Header />
-        <ModoAdminCSV />
-        <CatalogSearchPage />
+        <main className="main-content">
+          <ModoAdminCSV />
+          <CatalogSearchPage />
+        </main>
       </div>
     </AuthProvider>
   );

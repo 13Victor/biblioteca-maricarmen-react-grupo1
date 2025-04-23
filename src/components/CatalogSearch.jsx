@@ -134,7 +134,13 @@ function CatalogSearch({ onSearchResults }) {
         </div>
 
         <button type="submit" className="search-button" disabled={isLoading || searchQuery.trim() === ""}>
-          Buscar
+          {isLoading ? (
+            <div className="button-loader">
+              <div className="spinner"></div>
+            </div>
+          ) : (
+            "Buscar"
+          )}
         </button>
       </form>
     </div>
