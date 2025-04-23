@@ -27,8 +27,7 @@ body {
   color: var(--black);
 }
 
-.container,
-.ImportCSV {
+.container {
   padding: var(--spacing-2xl);
 }
 

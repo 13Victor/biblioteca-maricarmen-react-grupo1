@@ -1,21 +1,24 @@
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
-import CatalogSearchPage from "./components/CatalogSearchPage";
 import Header from "./components/Header";
 import { AuthProvider } from "./context/AuthContext";
 import "./styles/styles.css";
-import ModoAdminCSV from "./components/ModoAdminCSV";
 import Footer from "./components/Footer";
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   return (
     <AuthProvider>
-      <div className="App">
-        <Header />
-        <main className="main-content">
-          <ModoAdminCSV />
-          <CatalogSearchPage />
-        </main>
-      </div>
+      <Router>
+        <div className="App">
+          <Header />
+          <main className="main-content">
+            <AppRoutes />
+          </main>
+          <Footer />
+        </div>
+      </Router>
     </AuthProvider>
   );
 }
