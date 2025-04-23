@@ -73,11 +73,19 @@
 }
 
 .no-results {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-3xl);
-  background: var(--color-white, white);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-md);
+  text-align: center;
+  color: var(--danger-color);
+}
+
+.no-results p {
+  background-color: var(--danger-bg);
+  padding: var(--spacing-xs) var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  border-left: var(--spacing-xs) solid var(--danger-color);
 }
 
 /* ===== ITEMS DEL CATÁLOGO ===== */

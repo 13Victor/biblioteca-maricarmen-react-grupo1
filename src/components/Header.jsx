@@ -19,7 +19,7 @@ export default function Header() {
   return (
     <>
       <div id="header-container">
-        <h1>Biblioteca Maricarmen</h1>
+        <h1>Biblioteca Maricarmen Brito</h1>
         <div id="header-buttons">
           {isBilbiotecari && (
             <button onClick={() => (window.location.href = "http://localhost:8000/admin")}>Admin Panel</button>
