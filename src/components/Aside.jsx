@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function Aside() {
   const navigate = useNavigate();
-    const { isLogged, user } = useContext(AuthContext);
+    const { isLogged, usuari } = useContext(AuthContext);
   
     return (
       <aside className="aside-container">
