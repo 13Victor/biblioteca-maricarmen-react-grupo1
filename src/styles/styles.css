@@ -14,10 +14,13 @@
 
   /* Estados específicos */
   --success-bg: #d4edda;
+  --success-accent: #4a945b;
   --success-color: #155724;
   --warning-bg: #fff3cd;
+  --warning-accent: #b4963d;
   --warning-color: #856404;
   --danger-bg: #f8d7da;
+  --danger-accent: #a7575f;
   --danger-color: #721c24;
   --disabled-bg: #cccccc;
 
@@ -41,12 +44,15 @@
   --spacing-xl: 15px;
   --spacing-2xl: 20px;
   --spacing-3xl: 30px;
+  --spacing-4xl: 40px;
+  --spacing-5xl: 50px;
 
   /* Bordes y sombras */
   --border-radius-sm: 2px;
   --border-radius-md: 5px;
   --border-radius-lg: 8px;
   --border-radius-xl: 20px;
+  --border-radius-full: 9999px;
   --box-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --box-shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
   --box-shadow-lg: 0 5px 15px rgba(0, 0, 0, 0.15);
@@ -71,6 +77,32 @@ body {
   font-size: var(--font-size-base);
   background-color: var(--whitesmoke);
   color: var(--black);
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--spacing-2xl) var(--spacing-5xl);
 }
 
 .inputContainer {

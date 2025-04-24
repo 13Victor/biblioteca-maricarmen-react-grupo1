@@ -1,39 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
-import { searchSuggestions, searchCatalog } from '../services/api';
-import useDebounce from '../hooks/useDebounce';
+import { useState, useEffect, useRef } from "react";
+import { searchSuggestions, searchCatalog } from "../services/api";
+import useDebounce from "../hooks/useDebounce";
 
 function CatalogSearch({ onSearchResults }) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef(null);
-  
+
   // Aplicar debounce a la consulta de búsqueda
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Cargar todos los resultados al inicio
-  useEffect(() => {
-    const loadInitialResults = async () => {
-      setIsLoading(true);
-      try {
-        const results = await searchCatalog('');
-        onSearchResults(results, false); // false indica que NO es una búsqueda del usuario
-      } catch (error) {
-        console.error('Error al carregar resultats inicials:', error);
-        onSearchResults([], false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadInitialResults();
-  }, []);
+  // Eliminamos la carga inicial de resultados
+  // useEffect(() => {
+  //   const loadInitialResults = async () => {
+  //     ...
+  //   };
+  //
+  //   loadInitialResults();
+  // }, []);
 
   // Buscar sugerencias cuando cambia la consulta con debounce
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (debouncedSearchQuery.trim() === '') {
+      if (debouncedSearchQuery.trim() === "") {
         setSuggestions([]);
         return;
       }
@@ -49,7 +40,7 @@ function CatalogSearch({ onSearchResults }) {
         const data = await searchSuggestions(debouncedSearchQuery);
         setSuggestions(data);
       } catch (error) {
-        console.error('Error al obtindre suggerències:', error);
+        console.error("Error al obtener sugerencias:", error);
       } finally {
         setIsLoading(false);
       }
@@ -66,9 +57,9 @@ function CatalogSearch({ onSearchResults }) {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -89,20 +80,26 @@ function CatalogSearch({ onSearchResults }) {
 
   const handleSearch = async (query = searchQuery) => {
     const trimmedQuery = query.trim();
+
+    // No realizar búsqueda si la consulta está vacía
+    if (trimmedQuery === "") {
+      onSearchResults([], false);
+      return;
+    }
+
     setIsLoading(true);
-    
+
     try {
       const results = await searchCatalog(trimmedQuery);
-      // Si la consulta está vacía, tratarla como carga inicial
-      const isUserInitiatedSearch = trimmedQuery !== '';
-      onSearchResults(results, isUserInitiatedSearch);
+      // Pasamos true para indicar que es una búsqueda iniciada por el usuario
+      // incluso cuando no hay resultados
+      onSearchResults(results, true);
     } catch (error) {
-      console.error('Error en la cerca:', error);
-      onSearchResults([], trimmedQuery !== '');
+      console.error("Error en la búsqueda:", error);
+      onSearchResults([], true);
     } finally {
       setIsLoading(false);
       setShowSuggestions(false);
-      setSearchQuery('');
     }
   };
 
@@ -110,44 +107,40 @@ function CatalogSearch({ onSearchResults }) {
     e.preventDefault();
     handleSearch();
   };
-  
+
   return (
     <div className="search-container">
-      <form className='search-form' onSubmit={handleSubmit}>
+      <form className="search-form" onSubmit={handleSubmit}>
         <div className="search-input-container" ref={suggestionsRef}>
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
-            onFocus={() => searchQuery.trim() !== '' && setShowSuggestions(true)}
-            placeholder="Cercar en el catàleg..."
+            onFocus={() => searchQuery.trim() !== "" && setShowSuggestions(true)}
+            placeholder="Buscar en el catálogo..."
             className="search-input"
           />
-          
+
           {showSuggestions && suggestions.length > 0 && (
             <ul className="suggestions-list">
               {suggestions.map((suggestion) => (
-                <li
-                  key={suggestion.id}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className="suggestion-item"
-                >
+                <li key={suggestion.id} onClick={() => handleSuggestionClick(suggestion)} className="suggestion-item">
                   <span className="suggestion-title">{suggestion.titol}</span>
-                  {suggestion.autor && (
-                    <span className="informative-text"> - {suggestion.autor}</span>
-                  )}
+                  {suggestion.autor && <span className="informative-text"> - {suggestion.autor}</span>}
                 </li>
               ))}
             </ul>
           )}
         </div>
-        
-        <button 
-          type="submit" 
-          className="search-button"
-          disabled={isLoading}
-        >
-          Buscar
+
+        <button type="submit" className="search-button" disabled={isLoading || searchQuery.trim() === ""}>
+          {isLoading ? (
+            <div className="button-loader">
+              <div className="spinner"></div>
+            </div>
+          ) : (
+            "Buscar"
+          )}
         </button>
       </form>
     </div>
