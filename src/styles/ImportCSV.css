@@ -1,5 +1,10 @@
-.ImportCSV{
+.ImportCSV {
     padding: 0 10px;
+}
+
+.container-CSV {
+    margin-top: 20px;
+    margin-left: 20px;
 }
 
 

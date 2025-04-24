@@ -206,82 +206,84 @@ function ImportCSV() {
         <>
             <div className="container">
                 <h2>Importar Usuaris per CSV</h2>
-                <p>Carrega un fitxer CSV per importar usuaris de manera automatitzada.</p>
+                <div className="container-CSV">
+                    <p>Carrega un fitxer CSV per importar usuaris de manera automatitzada.</p>
 
-                <div className="CSV-actions">
-                    <input type="file" accept=".csv" onChange={handleFileUpload} />
-                    {data.length > 0 && (
-                        <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
-                            {isProcessing ? "Guardant..." : "Importar"}
-                        </button>
-                    )}
-                </div>
-
-        {uiState.message && (
-          <div className="API-response visible">
-            <p className="API-response-messages">{uiState.message}</p>
-          </div>
-        )}
-
-                {uiState.showResults && uiState.showValidation && (
-                    <div className="CSV-validation-results">
-                        {uiState.validationError ? (
-                            <ul className="validation-list">
-                                {validationResults
-                                    .filter((result) => !result.isValid)
-                                    .map((result, index) => (
-                                        <li key={index} className="invalid-row">
-                                            Fila {result.rowNumber}: ❌ Inválida -
-                                            {result.errors.map((error, i) => (
-                                                <span key={i}>
-                                                    {" "}
-                                                    {error}
-                                                    {i < result.errors.length - 1 ? "," : ""}
-                                                </span>
-                                            ))}
-                                        </li>
-                                    ))}
-                            </ul>
-                        ) : (
-                            <p className="valid-format">
-                                El format del CSV és correcte, prem "Importar" per iniciar la pujada de dades.
-                            </p>
+                    <div className="CSV-actions">
+                        <input type="file" accept=".csv" onChange={handleFileUpload} />
+                        {data.length > 0 && (
+                            <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
+                                {isProcessing ? "Guardant..." : "Importar"}
+                            </button>
                         )}
                     </div>
-                )}
 
-                {uiState.showUserResults && (
-                    <div className="CSV-show-results visible">
-                        <h3>Resultat Detallat</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Fila</th>
-                                    {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
-                                    <th>Detalls</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((row, index) => (
-                                    <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        {Object.values(row).map((value, i) => (
-                                            <td key={i}>{value}</td>
+                    {uiState.message && (
+                        <div className="API-response visible">
+                            <p className="API-response-messages">{uiState.message}</p>
+                        </div>
+                    )}
+
+                    {uiState.showResults && uiState.showValidation && (
+                        <div className="CSV-validation-results">
+                            {uiState.validationError ? (
+                                <ul className="validation-list">
+                                    {validationResults
+                                        .filter((result) => !result.isValid)
+                                        .map((result, index) => (
+                                            <li key={index} className="invalid-row">
+                                                Fila {result.rowNumber}: ❌ Inválida -
+                                                {result.errors.map((error, i) => (
+                                                    <span key={i}>
+                                                        {" "}
+                                                        {error}
+                                                        {i < result.errors.length - 1 ? "," : ""}
+                                                    </span>
+                                                ))}
+                                            </li>
                                         ))}
-                                        <td
-                                            className={
-                                                apiResults[row.email]?.status === "error"
-                                                    ? "error-message"
-                                                    : "success-message"
-                                            }>
-                                            {apiResults[row.email]?.message || "-"}
-                                        </td>
+                                </ul>
+                            ) : (
+                                <p className="valid-format">
+                                    El format del CSV és correcte, prem "Importar" per iniciar la pujada de dades.
+                                </p>
+                            )}
+                        </div>
+                    )}
+
+                    {uiState.showUserResults && (
+                        <div className="CSV-show-results visible">
+                            <h3>Resultat Detallat</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fila</th>
+                                        {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
+                                        <th>Detalls</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                                </thead>
+                                <tbody>
+                                    {data.map((row, index) => (
+                                        <tr key={index}>
+                                            <td>{index + 1}</td>
+                                            {Object.values(row).map((value, i) => (
+                                                <td key={i}>{value}</td>
+                                            ))}
+                                            <td
+                                                className={
+                                                    apiResults[row.email]?.status === "error"
+                                                        ? "error-message"
+                                                        : "success-message"
+                                                }>
+                                                {apiResults[row.email]?.message || "-"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     );
