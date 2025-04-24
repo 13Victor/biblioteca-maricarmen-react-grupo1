@@ -204,7 +204,7 @@ function ImportCSV() {
 
     return (
         <>
-            <div className="ImportCSV">
+            <div className="container">
                 <h2>Importar Usuaris per CSV</h2>
                 <p>Carrega un fitxer CSV per importar usuaris de manera automatitzada.</p>
 

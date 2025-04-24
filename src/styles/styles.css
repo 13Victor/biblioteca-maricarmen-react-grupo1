@@ -82,14 +82,6 @@ body {
   overflow: hidden;
 }
 
-.App {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
 .main-content {
   flex: 1;
   overflow: hidden;
