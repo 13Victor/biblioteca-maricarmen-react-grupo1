@@ -1,0 +1,27 @@
+:root[data-theme="dark"] {
+    /* Colores principales */
+    --black: #ffffff;
+    --grey: #a0a0a0;
+    --grey-light: #404040;
+    --grey-lighter: #333333;
+    --grey-dark: #b0b0b0;
+    --lightblue: #8b92c2;
+    --darkblue-accent: #3b4063;
+    --blue: #4158a3;
+    --darkblue: #2c3666;
+    --whitesmoke: #1a1a1a;
+    --white: #232323;
+    --button-color: #ffffff;
+  
+    /* Estados específicos */
+    --success-bg: #1e4027;
+    --success-accent: #2d5c38;
+    --success-color: #98c5a3;
+    --warning-bg: #4d3800;
+    --warning-accent: #665019;
+    --warning-color: #ffe083;
+    --danger-bg: #481215;
+    --danger-accent: #642026;
+    --danger-color: #f8b7bc;
+    --disabled-bg: #404040;
+  }
