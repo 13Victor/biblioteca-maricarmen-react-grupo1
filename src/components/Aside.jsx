@@ -16,14 +16,14 @@ function Aside() {
           </button>
   
           {/* Historial solo visible si está logueado */}
-          {isLogged && !user?.isAdmin && !user?.isBibliotecari && (
+          {isLogged && !usuari?.is_admin && !usuari?.is_staff && (
             <button>Historial</button>
           )}
           </div>
   
           <div id="aside-admin-content">
           {/* Botones visibles solo si es admin O bibliotecari */}
-          {isLogged && (!user?.isAdmin || !user?.isBibliotecari) && (
+          {isLogged && (usuari?.is_admin || usuari?.is_staff) && (
             <>
               <button onClick={() => navigate('/csv-importacio')}>
                 Importar Usuaris

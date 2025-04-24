@@ -28,9 +28,6 @@ export default function Header() {
       <div id="header-container">
         <h1>Biblioteca Maricarmen Brito</h1>
         <div id="header-buttons">
-          {isBilbiotecari && (
-            <button onClick={() => (window.location.href = "http://localhost:8000/admin")}>Panell d'Admin</button>
-          )}
           {!isLogged ? (
             <button id="login-button" onClick={toggleLogin}>
               Login
