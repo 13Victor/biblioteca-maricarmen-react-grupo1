@@ -13,7 +13,7 @@
   }
 
   .footer-data {
-    color: var(--white);
+    color: var(--button-color);
     display: flex;
     flex-direction: column;
   }

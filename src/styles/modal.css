@@ -16,7 +16,7 @@
 
 /* ===== MODAL CONTENEDOR ===== */
 .modal-content {
-  background: var(--color-white, white);
+  background: var(--white);
   padding: 2rem;
   border-radius: var(--border-radius-lg, 8px);
   max-width: 1800px;
@@ -75,7 +75,8 @@
 }
 
 .tag {
-  background: #e0e0e0;
+  background-color: var(--grey-light);
+  color: var(--grey-dark);
   padding: 0.25rem 0.75rem;
   border-radius: 15px;
   font-size: 0.9rem;

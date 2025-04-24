@@ -11,6 +11,7 @@
   --lightblue: #dee1f2;
   --whitesmoke: #fafafa;
   --white: #ffffff;
+  --button-color: #ffffff;
 
   /* Estados específicos */
   --success-bg: #d4edda;
@@ -187,7 +188,7 @@ input[type="submit"] {
 button,
 input[type="submit"] {
   background-color: var(--darkblue);
-  color: var(--white);
+  color: var(--button-color) !important;
   border: none;
   padding: var(--spacing-lg) var(--spacing-xl);
   border-radius: var(--border-radius-md);
