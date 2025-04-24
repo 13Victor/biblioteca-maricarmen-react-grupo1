@@ -1,0 +1,14 @@
+aside{
+    grid-area: aside-container;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--lightblue);
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    align-items: center;
+}
+
+aside button {
+    width: 270px;
+    margin: 10px;
+}

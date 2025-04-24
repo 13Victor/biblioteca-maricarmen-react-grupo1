@@ -1,6 +1,16 @@
 /* search.css - Refactorizado */
 
 /* ===== COMPONENTE DE BÚSQUEDA ===== */
+
+.catalog-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  padding: 0 10px;
+}
+
+
 .search-container {
   margin: var(--spacing-3xl) 0;
 }

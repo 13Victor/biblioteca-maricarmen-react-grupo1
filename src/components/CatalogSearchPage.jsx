@@ -19,7 +19,7 @@ function CatalogSearchPage() {
   };
 
   return (
-    <div className="container">
+    <div className="catalog-container">
       <h2>Catàleg de la Biblioteca</h2>
       
       <CatalogSearch onSearchResults={handleSearchResults} />
