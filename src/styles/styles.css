@@ -82,14 +82,6 @@ body {
   overflow: hidden;
 }
 
-.App {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
 .main-content {
   flex: 1;
   overflow: hidden;
@@ -163,7 +155,8 @@ label,
 
 /*MARK: Inputs*/
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="password"]{
   width: 100%;
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-md);
@@ -175,7 +168,8 @@ input[type="number"] {
 
 input[type="text"]:focus,
 input[type="number"]:focus,
-select:focus {
+select:focus,
+input[type="password"]:focus {
   outline: none;
   border-color: var(--blue);
   box-shadow: 0 0 4px var(--blue);

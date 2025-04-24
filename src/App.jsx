@@ -1,18 +1,21 @@
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
-import "./App.css";
+import "./styles/App.css";
 import Header from "./components/Header";
 import { AuthProvider } from "./context/AuthContext";
 import "./styles/styles.css";
 import Footer from "./components/Footer";
 import AppRoutes from "./routes/AppRoutes";
+import Aside from "./components/Aside";
 
 function App() {
+
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Header />
+          <Aside/>
           <main className="main-content">
             <AppRoutes />
           </main>

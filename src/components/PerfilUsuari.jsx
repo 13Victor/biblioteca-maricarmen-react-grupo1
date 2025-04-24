@@ -68,7 +68,7 @@ export default function PerfilUsuari() {
         alert(`Error: ${errorData.error}`);
       }
     } catch (error) {
-      alert("Error en la conexión con el servidor.", error);
+      alert("Error en la conexió amb el servidor.", error);
     }
   };
 
@@ -79,24 +79,24 @@ export default function PerfilUsuari() {
     <div id="perfilUsuari-container">
       <h2>{usuari.username}</h2>
       <div id="perfilUsuari-info">
-        <div><strong>Nombre: </strong>{isEditing ? <input type="text" name="first_name" value={editedData.first_name} onChange={handleInputChange} /> : usuari.first_name}</div>
-        <div><strong>Apellido: </strong>{isEditing ? <input type="text" name="last_name" value={editedData.last_name} onChange={handleInputChange} /> : usuari.last_name}</div>
+        <div><strong>Nom: </strong>{isEditing ? <input type="text" name="first_name" value={editedData.first_name} onChange={handleInputChange} /> : usuari.first_name}</div>
+        <div><strong>Cognom: </strong>{isEditing ? <input type="text" name="last_name" value={editedData.last_name} onChange={handleInputChange} /> : usuari.last_name}</div>
         <div><strong>Email: </strong>{isEditing ? <input type="email" name="email" value={editedData.email} onChange={handleInputChange} /> : usuari.email}</div>
-        <div><strong>Imagen: </strong>{isEditing ? <input type="file" name="imatge" accept="image/*" onChange={handleImageChange} /> : (usuari.imatge && <img src={`../..${usuari.imatge}`} alt="Imagen de perfil" width="100" />)}</div>
-        <div><strong>Centro: </strong>{usuari.centre}</div>
-        <div><strong>Ciclo: </strong>{usuari.cicle}</div>
-        <div><strong>Rol: </strong>{usuari.is_staff && usuari.is_superuser ? "Administrador" : usuari.is_staff ? "Bibliotecario" : "Usuario"}</div>
+        <div><strong>Imatge: </strong>{isEditing ? <input type="file" name="imatge" accept="image/*" onChange={handleImageChange} /> : (usuari.imatge && <img src={`../..${usuari.imatge}`} alt="Imagen de perfil" width="100" />)}</div>
+        <div><strong>Centre: </strong>{usuari.centre}</div>
+        <div><strong>Cicle: </strong>{usuari.cicle}</div>
+        <div><strong>Rol: </strong>{usuari.is_staff && usuari.is_superuser ? "Administrador" : usuari.is_staff ? "Bibliotecari" : "Usuari"}</div>
       </div>
       <div id="perfilUsuari-buttons-container">
         {isEditing ? (
           <>
-            <button onClick={handleSave}>Guardar</button>
-            <button onClick={() => setIsEditing(false)}>Cancelar</button>
+            <button onClick={handleSave}>Desar</button>
+            <button onClick={() => setIsEditing(false)}>Cancel·lar</button>
           </>
         ) : (
           <button onClick={() => setIsEditing(true)}>Editar</button>
         )}
-        <button onClick={handleLogOut}>Cerrar Sesión</button>
+        <button onClick={handleLogOut}>Tancar Sessió</button>
       </div>
     </div>
   );

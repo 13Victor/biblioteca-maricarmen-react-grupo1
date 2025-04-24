@@ -102,7 +102,7 @@ function CatalogSearchPage() {
             </div>
           ) : (
             <div className="no-results">
-              <p>No se encontraron resultados para esta búsqueda.</p>
+              <p>No s'han trobat resultats per aquesta cerca.</p>
             </div>
           )}
         </div>

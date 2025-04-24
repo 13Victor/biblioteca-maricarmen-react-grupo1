@@ -44,9 +44,9 @@ function CatalogItem({ item }) {
             // Fallback a la visualización anterior si no hay datos de conteo
             <>
               {item.exclos_prestec ? (
-                <span className="badge item-status excluded">No disponible para préstamo</span>
+                <span className="badge item-status excluded">No disponible par préstec</span>
               ) : item.baixa ? (
-                <span className="badge item-status baixa">De baja</span>
+                <span className="badge item-status baixa">De baixa</span>
               ) : (
                 <span className="badge item-status available">Disponible</span>
               )}

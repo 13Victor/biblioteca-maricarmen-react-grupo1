@@ -29,10 +29,10 @@ function ImportCSV() {
     headers.forEach((header, index) => {
       let value = row[index];
 
-      if (!value) {
-        isValid = false;
-        errors.push(`${header} es obligatorio.`);
-      }
+            if (!value) {
+                isValid = false;
+                errors.push(`${header} es obligatori.`);
+            }
 
       switch (header.toLowerCase()) {
         case "nom":
@@ -52,21 +52,21 @@ function ImportCSV() {
           parsedData.email = value;
           break;
 
-        case "telefon":
-          const phoneRegex = /^\d{9}$/;
-          if (!phoneRegex.test(value)) {
-            isValid = false;
-            errors.push("El teléfono debe contener exactamente 9 números.");
-          }
-          parsedData.telefon = value;
-          break;
+                case "telefon":
+                    const phoneRegex = /^\d{9}$/;
+                    if (!phoneRegex.test(value)) {
+                        isValid = false;
+                        errors.push("El telèfon ha de contenir exactament 9 números.");
+                    }
+                    parsedData.telefon = value;
+                    break;
 
-        default:
-          errors.push(`Columna no reconocida: ${header}`);
-          isValid = false;
-          break;
-      }
-    });
+                default:
+                    errors.push(`Columna no reconeguda: ${header}`);
+                    isValid = false;
+                    break;
+            }
+        });
 
     return { valid: isValid, data: parsedData, errors };
   };
@@ -130,12 +130,12 @@ function ImportCSV() {
   const saveUsersToBackend = async () => {
     if (data.length === 0) return;
 
-    setIsProcessing(true);
-    setUiState((prev) => ({
-      ...prev,
-      showValidation: false,
-      message: "Procesando usuarios...",
-    }));
+        setIsProcessing(true);
+        setUiState((prev) => ({
+            ...prev,
+            showValidation: false,
+            message: "Processant usuaris...",
+        }));
 
     try {
       const response = await fetch("http://127.0.0.1:8000/import_users/", {
@@ -162,60 +162,60 @@ function ImportCSV() {
           });
         }
 
-        // Para los usuarios que no tienen errores
-        data.forEach((user) => {
-          if (!userResults[user.email]) {
-            userResults[user.email] = {
-              status: "success",
-              message: "Usuario creado correctamente",
-            };
-          }
-        });
+                // Para los usuarios que no tienen errores
+                data.forEach((user) => {
+                    if (!userResults[user.email]) {
+                        userResults[user.email] = {
+                            status: "success",
+                            message: "Usuari creat correctament",
+                        };
+                    }
+                });
 
         setApiResults(userResults);
 
-        const message =
-          result.errors === 0
-            ? "Usuarios importados correctamente."
-            : `Importación completada con ${result.errors} errores. Revisa los detalles.`;
+                const message =
+                    result.errors === 0
+                        ? "Usuaris importats correctament."
+                        : `Importació completada amb ${result.errors} errors. Revisa els detalls.`;
 
-        setUiState((prev) => ({
-          ...prev,
-          showUserResults: true,
-          message,
-        }));
-      } else {
-        setUiState((prev) => ({
-          ...prev,
-          showValidation: true,
-          message: `Error: ${result.error}`,
-        }));
-      }
-    } catch (error) {
-      setUiState((prev) => ({
-        ...prev,
-        showValidation: true,
-        message: `Error al conectar con el backend: ${error.message}`,
-      }));
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+                setUiState((prev) => ({
+                    ...prev,
+                    showUserResults: true,
+                    message,
+                }));
+            } else {
+                setUiState((prev) => ({
+                    ...prev,
+                    showValidation: true,
+                    message: `Error: ${result.error}`,
+                }));
+            }
+        } catch (error) {
+            setUiState((prev) => ({
+                ...prev,
+                showValidation: true,
+                message: `Error al connectar amb el backend: ${error.message}`,
+            }));
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
-  return (
-    <>
-      <div className="container">
-        <h2>Importar Usuarios por CSV</h2>
-        <p>Carga un fichero CSV para importar usuarios de manera automatizada.</p>
+    return (
+        <>
+            <div className="container">
+                <h2>Importar Usuaris per CSV</h2>
+                <p>Carrega un fitxer CSV per importar usuaris de manera automatitzada.</p>
 
-        <div className="CSV-actions">
-          <input type="file" accept=".csv" onChange={handleFileUpload} />
-          {data.length > 0 && (
-            <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
-              {isProcessing ? "Guardando..." : "Importar"}
-            </button>
-          )}
-        </div>
+                <div className="CSV-actions">
+                    <input type="file" accept=".csv" onChange={handleFileUpload} />
+                    {data.length > 0 && (
+                        <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
+                            {isProcessing ? "Guardant..." : "Importar"}
+                        </button>
+                    )}
+                </div>
 
         {uiState.message && (
           <div className="API-response visible">
@@ -223,63 +223,68 @@ function ImportCSV() {
           </div>
         )}
 
-        {uiState.showResults && uiState.showValidation && (
-          <div className="CSV-validation-results">
-            {uiState.validationError ? (
-              <ul className="validation-list">
-                {validationResults
-                  .filter((result) => !result.isValid)
-                  .map((result, index) => (
-                    <li key={index} className="invalid-row">
-                      Fila {result.rowNumber}: ❌ Inválida -
-                      {result.errors.map((error, i) => (
-                        <span key={i}>
-                          {" "}
-                          {error}
-                          {i < result.errors.length - 1 ? "," : ""}
-                        </span>
-                      ))}
-                    </li>
-                  ))}
-              </ul>
-            ) : (
-              <p className="valid-format">
-                El formato del CSV es correcto, pulse "Importar" para iniciar la subida de datos.
-              </p>
-            )}
-          </div>
-        )}
+                {uiState.showResults && uiState.showValidation && (
+                    <div className="CSV-validation-results">
+                        {uiState.validationError ? (
+                            <ul className="validation-list">
+                                {validationResults
+                                    .filter((result) => !result.isValid)
+                                    .map((result, index) => (
+                                        <li key={index} className="invalid-row">
+                                            Fila {result.rowNumber}: ❌ Inválida -
+                                            {result.errors.map((error, i) => (
+                                                <span key={i}>
+                                                    {" "}
+                                                    {error}
+                                                    {i < result.errors.length - 1 ? "," : ""}
+                                                </span>
+                                            ))}
+                                        </li>
+                                    ))}
+                            </ul>
+                        ) : (
+                            <p className="valid-format">
+                                El format del CSV és correcte, prem "Importar" per iniciar la pujada de dades.
+                            </p>
+                        )}
+                    </div>
+                )}
 
-        {uiState.showUserResults && (
-          <div className="CSV-show-results visible">
-            <h3>Resultado Detallado</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Fila</th>
-                  {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
-                  <th>Detalles</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((row, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    {Object.values(row).map((value, i) => (
-                      <td key={i}>{value}</td>
-                    ))}
-                    <td className={apiResults[row.email]?.status === "error" ? "error-message" : "success-message"}>
-                      {apiResults[row.email]?.message || "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </>
-  );
+                {uiState.showUserResults && (
+                    <div className="CSV-show-results visible">
+                        <h3>Resultat Detallat</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fila</th>
+                                    {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
+                                    <th>Detalls</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((row, index) => (
+                                    <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        {Object.values(row).map((value, i) => (
+                                            <td key={i}>{value}</td>
+                                        ))}
+                                        <td
+                                            className={
+                                                apiResults[row.email]?.status === "error"
+                                                    ? "error-message"
+                                                    : "success-message"
+                                            }>
+                                            {apiResults[row.email]?.message || "-"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </>
+    );
 }
 
 export default ImportCSV;
