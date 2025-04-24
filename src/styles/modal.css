@@ -19,7 +19,7 @@
   background: var(--color-white, white);
   padding: 2rem;
   border-radius: var(--border-radius-lg, 8px);
-  max-width: 1200px;
+  max-width: 1800px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
