@@ -3,7 +3,8 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 function Aside({ onComponentChange }) {
-    const { isLogged, user } = useContext(AuthContext);
+    const { isLogged, usuari } = useContext(AuthContext);
+    console.log("usuari: ",usuari);
   
     return (
       <aside className="aside-container">
@@ -14,14 +15,14 @@ function Aside({ onComponentChange }) {
           </button>
   
           {/* Historial solo visible si está logueado */}
-          {isLogged && !user?.isAdmin && !user?.isBibliotecari && (
+          {isLogged && !usuari?.is_admin && !usuari?.is_staff && (
             <button>Historial</button>
           )}
           </div>
   
           <div id="aside-admin-content">
           {/* Botones visibles solo si es admin O bibliotecari */}
-          {isLogged && (!user?.isAdmin || !user?.isBibliotecari) && (
+          {isLogged && (usuari?.is_admin || usuari?.is_staff) && (
             <>
               <button onClick={() => onComponentChange('importCSV')}>
                 Importar Usuaris
