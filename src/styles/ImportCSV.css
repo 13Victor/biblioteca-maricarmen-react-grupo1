@@ -49,9 +49,148 @@ input[type="file"] {
     transition: 0.3s;
 }
 
-table {
+/* Estilos específicos para la tabla CSV */
+.tableCSV-container {
+    margin: 20px 0;
+    overflow-x: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+}
+
+.tableCSV-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    font-size: 0.9rem;
+}
+
+.tableCSV-table th {
+    background-color: var(--darkblue);
+    color: white;
+    font-weight: bold;
+    padding: 12px 15px;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    position: sticky;
+    top: 0;
+    border-bottom: 2px solid #ddd;
+}
+
+.tableCSV-table th:first-child {
+    border-top-left-radius: var(--border-radius);
+}
+
+.tableCSV-table th:last-child {
+    border-top-right-radius: var(--border-radius);
+}
+
+.tableCSV-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tableCSV-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tableCSV-table tr:hover td {
+    background-color: #f0f7ff;
+}
+
+.tableCSV-table tr:last-child td:first-child {
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.tableCSV-table tr:last-child td:last-child {
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.tableCSV-success {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.tableCSV-error {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.tableCSV-row-number {
+    font-weight: bold;
     text-align: center;
-    margin: 10px;
+    width: 50px;
+    background-color: #f2f2f2;
+}
+
+.container {
+    overflow-y: auto;
+    max-height: 90vh;
+    padding: 20px;
+}
+
+/* Estilos de paginación */
+.tableCSV-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+    gap: 10px;
+}
+
+.tableCSV-pagination-button {
+    background-color: var(--darkblue);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.tableCSV-pagination-button:hover {
+    background-color: #0056b3;
+}
+
+.tableCSV-pagination-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.tableCSV-pagination-info {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.tableCSV-pagination-pages {
+    display: flex;
+    gap: 5px;
+}
+
+.tableCSV-pagination-page {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.tableCSV-pagination-page.active {
+    background-color: var(--darkblue);
+    color: white;
+}
+
+.tableCSV-pagination-page:hover:not(.active) {
+    background-color: #e9ecef;
 }

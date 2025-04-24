@@ -156,7 +156,7 @@ label,
 /*MARK: Inputs*/
 input[type="text"],
 input[type="number"],
-input[type="password"]{
+input[type="password"] {
   width: 100%;
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-md);
@@ -303,4 +303,17 @@ input[type="radio"]::before {
 
 input[type="radio"]:checked::before {
   transform: translate(-50%, -50%) scale(1);
+}
+
+/* MARK: Clases de colores de acento */
+.success-accent {
+  color: var(--success-accent);
+}
+
+.warning-accent {
+  color: var(--warning-accent);
+}
+
+.danger-accent {
+  color: var(--danger-accent);
 }
