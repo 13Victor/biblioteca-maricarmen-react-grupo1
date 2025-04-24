@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./ImportCSV.css";
+import "../styles/ImportCSV.css";
 
 function ImportCSV() {
     // Estado principal para datos y validación
@@ -31,7 +31,7 @@ function ImportCSV() {
 
             if (!value) {
                 isValid = false;
-                errors.push(`${header} es obligatorio.`);
+                errors.push(`${header} es obligatori.`);
             }
 
             switch (header.toLowerCase()) {
@@ -56,13 +56,13 @@ function ImportCSV() {
                     const phoneRegex = /^\d{9}$/;
                     if (!phoneRegex.test(value)) {
                         isValid = false;
-                        errors.push("El teléfono debe contener exactamente 9 números.");
+                        errors.push("El telèfon ha de contenir exactament 9 números.");
                     }
                     parsedData.telefon = value;
                     break;
 
                 default:
-                    errors.push(`Columna no reconocida: ${header}`);
+                    errors.push(`Columna no reconeguda: ${header}`);
                     isValid = false;
                     break;
             }
@@ -134,7 +134,7 @@ function ImportCSV() {
         setUiState((prev) => ({
             ...prev,
             showValidation: false,
-            message: "Procesando usuarios...",
+            message: "Processant usuaris...",
         }));
 
         try {
@@ -167,7 +167,7 @@ function ImportCSV() {
                     if (!userResults[user.email]) {
                         userResults[user.email] = {
                             status: "success",
-                            message: "Usuario creado correctamente",
+                            message: "Usuari creat correctament",
                         };
                     }
                 });
@@ -176,8 +176,8 @@ function ImportCSV() {
 
                 const message =
                     result.errors === 0
-                        ? "Usuarios importados correctamente."
-                        : `Importación completada con ${result.errors} errores. Revisa los detalles.`;
+                        ? "Usuaris importats correctament."
+                        : `Importació completada amb ${result.errors} errors. Revisa els detalls.`;
 
                 setUiState((prev) => ({
                     ...prev,
@@ -195,7 +195,7 @@ function ImportCSV() {
             setUiState((prev) => ({
                 ...prev,
                 showValidation: true,
-                message: `Error al conectar con el backend: ${error.message}`,
+                message: `Error al connectar amb el backend: ${error.message}`,
             }));
         } finally {
             setIsProcessing(false);
@@ -204,83 +204,85 @@ function ImportCSV() {
 
     return (
         <>
-            <h2>Importar Usuarios por CSV</h2>
-            <p>Carga un fichero CSV para importar usuarios de manera automatizada.</p>
+            <div className="ImportCSV">
+                <h2>Importar Usuaris per CSV</h2>
+                <p>Carrega un fitxer CSV per importar usuaris de manera automatitzada.</p>
 
-            <div className="CSV-actions">
-                <input type="file" accept=".csv" onChange={handleFileUpload} />
-                {data.length > 0 && (
-                    <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
-                        {isProcessing ? "Guardando..." : "Importar"}
-                    </button>
-                )}
-            </div>
-
-            {uiState.message && (
-                <div className="API-response visible">
-                    <p className="API-response-messages">{uiState.message}</p>
-                </div>
-            )}
-
-            {uiState.showResults && uiState.showValidation && (
-                <div className="CSV-validation-results">
-                    {uiState.validationError ? (
-                        <ul className="validation-list">
-                            {validationResults
-                                .filter((result) => !result.isValid)
-                                .map((result, index) => (
-                                    <li key={index} className="invalid-row">
-                                        Fila {result.rowNumber}: ❌ Inválida -
-                                        {result.errors.map((error, i) => (
-                                            <span key={i}>
-                                                {" "}
-                                                {error}
-                                                {i < result.errors.length - 1 ? "," : ""}
-                                            </span>
-                                        ))}
-                                    </li>
-                                ))}
-                        </ul>
-                    ) : (
-                        <p className="valid-format">
-                            El formato del CSV es correcto, pulse "Importar" para iniciar la subida de datos.
-                        </p>
+                <div className="CSV-actions">
+                    <input type="file" accept=".csv" onChange={handleFileUpload} />
+                    {data.length > 0 && (
+                        <button onClick={saveUsersToBackend} disabled={isProcessing} className="save-button">
+                            {isProcessing ? "Guardant..." : "Importar"}
+                        </button>
                     )}
                 </div>
-            )}
 
-            {uiState.showUserResults && (
-                <div className="CSV-show-results visible">
-                    <h3>Resultado Detallado</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fila</th>
-                                {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
-                                <th>Detalles</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((row, index) => (
-                                <tr key={index}>
-                                    <td>{index + 1}</td>
-                                    {Object.values(row).map((value, i) => (
-                                        <td key={i}>{value}</td>
+                {uiState.message && (
+                    <div className="API-response visible">
+                        <p className="API-response-messages">{uiState.message}</p>
+                    </div>
+                )}
+
+                {uiState.showResults && uiState.showValidation && (
+                    <div className="CSV-validation-results">
+                        {uiState.validationError ? (
+                            <ul className="validation-list">
+                                {validationResults
+                                    .filter((result) => !result.isValid)
+                                    .map((result, index) => (
+                                        <li key={index} className="invalid-row">
+                                            Fila {result.rowNumber}: ❌ Inválida -
+                                            {result.errors.map((error, i) => (
+                                                <span key={i}>
+                                                    {" "}
+                                                    {error}
+                                                    {i < result.errors.length - 1 ? "," : ""}
+                                                </span>
+                                            ))}
+                                        </li>
                                     ))}
-                                    <td
-                                        className={
-                                            apiResults[row.email]?.status === "error"
-                                                ? "error-message"
-                                                : "success-message"
-                                        }>
-                                        {apiResults[row.email]?.message || "-"}
-                                    </td>
+                            </ul>
+                        ) : (
+                            <p className="valid-format">
+                                El format del CSV és correcte, prem "Importar" per iniciar la pujada de dades.
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {uiState.showUserResults && (
+                    <div className="CSV-show-results visible">
+                        <h3>Resultat Detallat</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fila</th>
+                                    {data.length > 0 && Object.keys(data[0]).map((key) => <th key={key}>{key}</th>)}
+                                    <th>Detalls</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                            </thead>
+                            <tbody>
+                                {data.map((row, index) => (
+                                    <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        {Object.values(row).map((value, i) => (
+                                            <td key={i}>{value}</td>
+                                        ))}
+                                        <td
+                                            className={
+                                                apiResults[row.email]?.status === "error"
+                                                    ? "error-message"
+                                                    : "success-message"
+                                            }>
+                                            {apiResults[row.email]?.message || "-"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </>
     );
 }

@@ -1,9 +1,12 @@
 #header-container{
+    grid-area: header-container;
     background-color: var(--darkblue);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: var(--spacing-md);
+    align-items: center;
+
 }
 
 #header-container h1{

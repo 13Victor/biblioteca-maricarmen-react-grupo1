@@ -1,0 +1,41 @@
+.footer {
+    grid-area: footer;
+    background-color: var(--darkblue);
+    padding: 5px 0;
+  }
+  
+  .footer-content {
+    margin: 0 auto;
+    display: flex;
+    gap: 10%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer-data {
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .footer-data p {
+    font-weight: bold;
+  }
+
+  .footer-data span{
+    margin: 3px 0;
+  }
+  
+  .gif-container {
+    height: 100px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .gif-container img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }

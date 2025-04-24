@@ -15,7 +15,6 @@ export default function Login() {
 
         setIsLoading(true);
         setError(null);
-
         fetch("http://localhost:8000/api/token/", {
             method: "GET",
             headers: {
@@ -24,7 +23,7 @@ export default function Login() {
             },
         })
             .then((response) => {
-                if (!response.ok) throw new Error("Usuari o contrasenya incorrectes");
+                if (!response.ok) throw new Error("Usuari o contrassenya incorrectes");
                 return response.json();
             })
             .then((data) => {
@@ -42,7 +41,7 @@ export default function Login() {
 
     return (
         <div id="login-container">
-            <h2>Login</h2>
+            <h1>Login</h1>
             <form onSubmit={(e) => { e.preventDefault(); setDoFetch(true); }}>
                 {error && <p style={{ color: "red", padding: "5px" }}>{error}</p>}
                 <div>
@@ -54,7 +53,7 @@ export default function Login() {
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 <button type="submit" disabled={isLoading}>
-                    {isLoading ? "Carregant..." : "Login"}
+                    {isLoading ? "Carregant..." : "Iniciar Sessió"}
                 </button>
             </form>
         </div>

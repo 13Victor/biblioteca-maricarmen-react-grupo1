@@ -1,9 +1,13 @@
 #login-container{
     position: fixed;
     right: 0;
-    margin-right: 20px;
     width: 500px;
-    background-color: lightgray;
+    background-color: var( --grey-lighter);
+    padding: var(--spacing-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius-lg);
+    z-index: 9000;
+    margin-top: 4.5%;
 }
 
 #login-container form{
@@ -11,9 +15,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: var(--spacing-lg);
 }
 
 #login-container form button{
-    margin-top: 10px;
+    margin-top: var(--spacing-lg);
 }
