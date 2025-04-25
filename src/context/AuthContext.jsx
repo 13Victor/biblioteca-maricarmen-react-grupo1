@@ -53,7 +53,11 @@ export const AuthProvider = ({ children }) => {
         setErrorProfile("No s'ha trobat cap usuari. Si us plau, inicia sessió.");
         return;
       }
-      fetch("http://localhost:8000/api/usuari/", {
+      
+      // Usar la misma base URL que en api.js
+      const API_BASE_URL = "http://localhost:8000/api";
+      
+      fetch(`${API_BASE_URL}/usuari/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
