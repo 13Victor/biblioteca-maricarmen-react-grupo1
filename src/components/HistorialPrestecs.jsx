@@ -20,7 +20,7 @@ export default function HistorialPrestecs() {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:8000/api/usuari/historial_prestecs?usuari_id=${usuari.id}`,
+          `/api/usuari/historial_prestecs?usuari_id=${usuari.id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
