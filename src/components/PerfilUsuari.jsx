@@ -47,7 +47,7 @@ export default function PerfilUsuari() {
         formData.append("imatge", editedData.imatge);
       }
 
-      const response = await fetch("http://localhost:8000/api/editUsuari/", {
+      const response = await fetch("/api/editUsuari/", {
         method: "POST",
         body: formData,
       });
