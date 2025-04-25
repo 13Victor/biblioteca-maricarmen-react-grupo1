@@ -84,7 +84,7 @@ export default function PerfilUsuari() {
         <div><strong>Email: </strong>{isEditing ? <input type="email" name="email" value={editedData.email} onChange={handleInputChange} /> : usuari.email}</div>
         <div><strong>Imatge: </strong>{isEditing ? <input type="file" name="imatge" accept="image/*" onChange={handleImageChange} /> : (usuari.imatge && <img src={`../..${usuari.imatge}`} alt="Imagen de perfil" width="100" />)}</div>
         <div><strong>Centre: </strong>{usuari.centre}</div>
-        <div><strong>Cicle: </strong>{usuari.cicle}</div>
+        <div><strong>Grup: </strong>{usuari.grup}</div>
         <div><strong>Rol: </strong>{usuari.is_staff && usuari.is_superuser ? "Administrador" : usuari.is_staff ? "Bibliotecari" : "Usuari"}</div>
       </div>
       <div id="perfilUsuari-buttons-container">
