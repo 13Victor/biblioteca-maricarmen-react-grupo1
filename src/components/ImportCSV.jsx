@@ -212,7 +212,7 @@ function ImportCSV() {
         }));
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/import_users/", {
+            const response = await fetch("/import_users/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
