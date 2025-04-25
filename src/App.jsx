@@ -1,5 +1,4 @@
 import React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
 import "./styles/App.css";
 import Header from "./components/Header";
 import { AuthProvider } from "./context/AuthContext";
@@ -14,7 +13,6 @@ function App() {
   return (
     <ThemeProvider>
     <AuthProvider>
-      <Router>
         <div className="App">
           <Header />
           <ThemeToggle/>
@@ -24,7 +22,6 @@ function App() {
           </main>
           <Footer />
         </div>
-      </Router>
     </AuthProvider>
     </ThemeProvider>
   );

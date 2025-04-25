@@ -1,12 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext} from "react";
 import { getExemplarsByItem } from "../services/api";
 import Pagination from "./Pagination";
 import "../styles/Table.css";
+import { AuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function ItemPrestecTable({ bookId }) {
   const [exemplars, setExemplars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Properly access the isBibliotecari from context
+  const { isBilbiotecari } = useContext(AuthContext);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,6 +89,9 @@ function ItemPrestecTable({ bookId }) {
 
   const currentExemplars = getCurrentItems();
 
+  // Add a console log to check the value of isBilbiotecari
+  console.log("ItemPrestecTable - isBilbiotecari:", isBilbiotecari);
+
   return (
     <div id="historial-prestecs-container">
       <h3>Ejemplares en tu centro ({exemplars.length})</h3>
@@ -92,6 +100,7 @@ function ItemPrestecTable({ bookId }) {
           <tr>
             <th>Registro</th>
             <th>Estado</th>
+            {isBilbiotecari && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -103,6 +112,23 @@ function ItemPrestecTable({ bookId }) {
                   {getStatusText(exemplar)}
                 </span>
               </td>
+              {/* Fix the variable name here - it was a typo */}
+              {isBilbiotecari && (
+                <td>
+                  {!exemplar.baixa && !exemplar.exclos_prestec && (
+                    <Link 
+                      to={`/crear-prestamo/${exemplar.id}`} 
+                      className="btn btn-primary btn-sm"
+                      onClick={(e) => {
+                        // Add a click event to debug
+                        console.log(`Navigating to /crear-prestamo/${exemplar.id}`);
+                      }}
+                    >
+                      Hacer préstamo
+                    </Link>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

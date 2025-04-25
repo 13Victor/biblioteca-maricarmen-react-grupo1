@@ -71,6 +71,9 @@ export const AuthProvider = ({ children }) => {
         })
         .then((data) => {
           setUsuari(data);
+          // IMPORTANT: Store user data in sessionStorage for access across routes
+          sessionStorage.setItem("userData", JSON.stringify(data));
+          console.log("User data stored in session:", data);
         })
         .catch((error) => {
           console.error("Error al obtenir les dades:", error);
