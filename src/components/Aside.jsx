@@ -28,7 +28,7 @@ function Aside() {
               <button onClick={() => navigate('/csv-importacio')}>
                 Importar Usuaris
               </button>
-              <button>Panell d'Administració</button>
+              <button onClick={() => (window.location.href = '/admin')}>Panell d'Administració</button>
             </>
           )}
           </div>
