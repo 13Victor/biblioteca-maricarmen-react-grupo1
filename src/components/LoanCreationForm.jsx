@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getExemplarById, getAvailableUsers, createLoan } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import Pagination from "./Pagination";
 import "../styles/LoanCreationForm.css";
 
 function LoanCreationForm() {
@@ -21,6 +22,11 @@ function LoanCreationForm() {
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const [totalPages, setTotalPages] = useState(0);
+
   // Debug access state
   console.log("LoanCreationForm - Auth state:", { isLogged, isBilbiotecari, exemplarId });
 
@@ -35,6 +41,13 @@ function LoanCreationForm() {
       sessionStorage.setItem("userData", JSON.stringify(usuari));
     }
   }, []);
+
+  // Calculate total pages when filtered users change
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
+    // Reset to first page when new search results arrive
+    setCurrentPage(1);
+  }, [filteredUsers, itemsPerPage]);
 
   // Load exemplar data
   useEffect(() => {
@@ -76,9 +89,9 @@ function LoanCreationForm() {
           throw new Error(`Error al obtener el ejemplar: ${err.message}`);
         }
 
-        // Load all users initially, but don't filter them yet
+        // Load all users initially - don't filter by center
         try {
-          console.log("Fetching available users");
+          console.log("Fetching all available users");
           const usersData = await getAvailableUsers();
           console.log("Users data received:", usersData);
           setUsers(usersData);
@@ -109,6 +122,7 @@ function LoanCreationForm() {
       return;
     }
 
+    // Filter users regardless of center
     const filtered = users.filter(
       (user) =>
         user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -160,9 +174,43 @@ function LoanCreationForm() {
     }
   };
 
+  // Get current users for the page
+  const getCurrentUsers = () => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  };
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleFirstPage = () => {
+    setCurrentPage(1);
+  };
+
+  const handleLastPage = () => {
+    setCurrentPage(totalPages);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   if (loading) return <div className="loan-form-container loading fullscreen">Cargando datos...</div>;
   if (error) return <div className="loan-form-container error fullscreen">{error}</div>;
   if (success) return <div className="loan-form-container success fullscreen">¡Préstamo creado correctamente!</div>;
+
+  const currentUsers = getCurrentUsers();
 
   return (
     <div className="loan-form-container fullscreen">
@@ -200,32 +248,50 @@ function LoanCreationForm() {
         </div>
 
         {hasSearched && (
-          <div className="search-results">
+          <div className="search-results-container">
             <h3>Resultados de la búsqueda ({filteredUsers.length})</h3>
 
             {filteredUsers.length > 0 ? (
-              <div className="user-results-container">
-                {filteredUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className={`user-item ${selectedUser === user.id ? "selected" : ""}`}
-                    onClick={() => setSelectedUser(user.id)}
-                  >
-                    <div className="user-info">
-                      <p className="user-name">
-                        {user.first_name} {user.last_name}
-                      </p>
-                      <p className="user-details">
-                        <span className="username">{user.username}</span>
-                        {user.centre && <span className="centre"> - {user.centre}</span>}
-                      </p>
-                      {user.email && <p className="user-email">{user.email}</p>}
+              <div className="results-with-pagination">
+                <div className="user-results-grid catalog-grid">
+                  {currentUsers.map((user) => (
+                    <div
+                      key={user.id}
+                      className={`user-card catalog-item ${selectedUser === user.id ? "selected" : ""}`}
+                      onClick={() => setSelectedUser(user.id)}
+                    >
+                      <p className="item-title">{`${user.first_name} ${user.last_name}`}</p>
+                      <p className="informative-text item-author">{user.username}</p>
+                      <div className="badgeContainer">
+                        <span className="badge item-type-badge">{user.email}</span>
+                        {user.centre && (
+                          <span className="badge item-status available">
+                            {typeof user.centre === "object" ? user.centre.nom : user.centre}
+                          </span>
+                        )}
+                      </div>
+                      {selectedUser === user.id && (
+                        <div className="selection-indicator">
+                          <i className="fas fa-check"></i>
+                        </div>
+                      )}
                     </div>
-                    <div className="selection-indicator">
-                      {selectedUser === user.id && <i className="fas fa-check"></i>}
-                    </div>
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="pagination-wrapper">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                      onFirstPage={handleFirstPage}
+                      onLastPage={handleLastPage}
+                      onPrevPage={handlePrevPage}
+                      onNextPage={handleNextPage}
+                    />
                   </div>
-                ))}
+                )}
               </div>
             ) : (
               <div className="no-results">

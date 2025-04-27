@@ -41,7 +41,7 @@ function ItemPrestecTable({ bookId }) {
 
   if (loading) return <p>Cargando ejemplares...</p>;
   if (error) return <p className="error-message">{error}</p>;
-  if (exemplars.length === 0) return <p>No hay ejemplares disponibles en tu centro para este ítem.</p>;
+  if (exemplars.length === 0) return <p>No hay ejemplares disponibles para este ítem.</p>;
 
   const getStatusClass = (exemplar) => {
     if (exemplar.baixa) return "estat-pill baixa";
@@ -94,11 +94,12 @@ function ItemPrestecTable({ bookId }) {
 
   return (
     <div id="historial-prestecs-container">
-      <h3>Ejemplares en tu centro ({exemplars.length})</h3>
+      <h3>Ejemplares disponibles ({exemplars.length})</h3>
       <table>
         <thead>
           <tr>
             <th>Registro</th>
+            <th>Centro</th>
             <th>Estado</th>
             {isBilbiotecari && <th>Acciones</th>}
           </tr>
@@ -107,10 +108,10 @@ function ItemPrestecTable({ bookId }) {
           {currentExemplars.map((exemplar) => (
             <tr key={exemplar.id}>
               <td>{exemplar.registre || "Sin registro"}</td>
+              <td>{exemplar.centre?.nom || "Sin centro"}</td>
               <td>
                 <span className={getStatusClass(exemplar)}>{getStatusText(exemplar)}</span>
               </td>
-              {/* Fix the variable name here - it was a typo */}
               {isBilbiotecari && (
                 <td>
                   {!exemplar.baixa && !exemplar.exclos_prestec && (
