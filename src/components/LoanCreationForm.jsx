@@ -150,7 +150,7 @@ function LoanCreationForm() {
     });
 
     if (!selectedUser) {
-      setError("Debes seleccionar un usuario");
+      setError("Has de seleccionar un usuari");
       return;
     }
 
@@ -167,7 +167,7 @@ function LoanCreationForm() {
         navigate(-1); // Go back after successful creation
       }, 2000);
     } catch (err) {
-      setError(err.message || "Error al crear el préstamo");
+      setError(err.message || "Error al crear el préstec");
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -206,27 +206,30 @@ function LoanCreationForm() {
     }
   };
 
-  if (loading) return <div className="loan-form-container loading fullscreen">Cargando datos...</div>;
+  if (loading) return <div className="loan-form-container loading fullscreen">Carregant dades...</div>;
   if (error) return <div className="loan-form-container error fullscreen">{error}</div>;
-  if (success) return <div className="loan-form-container success fullscreen">¡Préstamo creado correctamente!</div>;
+  if (success) return <div className="loan-form-container success fullscreen">Préstec creat correctament!</div>;
 
   const currentUsers = getCurrentUsers();
 
   return (
     <div className="loan-form-container fullscreen">
       <div className="loan-form-content">
-        <h2>Crear Préstamo</h2>
+        <h2>Crear Préstec</h2>
 
         <div className="exemplar-info">
-          <h3>Información del ejemplar</h3>
+          <h3>Informació de l'exemplar</h3>
           <p>
-            <strong>Título:</strong> {exemplar?.cataleg?.titol}
+            <strong>Títol:</strong> {exemplar?.cataleg?.titol || "No especificat"}
           </p>
           <p>
-            <strong>Autor:</strong> {exemplar?.cataleg?.autor || "No especificado"}
+            <strong>Autor:</strong> {exemplar?.cataleg?.autor || "No especificat"}
           </p>
           <p>
-            <strong>Registro:</strong> {exemplar?.registre || "Sin registro"}
+            <strong>Registre:</strong> {exemplar?.registre || "Sense registre"}
+          </p>
+          <p>
+            <strong>Centre:</strong> {exemplar?.centre?.nom || "No especificat"}
           </p>
         </div>
 
@@ -237,19 +240,19 @@ function LoanCreationForm() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar usuario por nombre, email o username..."
+                placeholder="Cercar usuari per nom, email o username..."
                 className="search-input"
               />
             </div>
             <button type="submit" className="search-button" disabled={isSearching || searchTerm.trim() === ""}>
-              {isSearching ? "Buscando..." : "Buscar"}
+              {isSearching ? "Cercant..." : "Cercar"}
             </button>
           </form>
         </div>
 
         {hasSearched && (
           <div className="search-results-container">
-            <h3>Resultados de la búsqueda ({filteredUsers.length})</h3>
+            <h3>Resultats de la cerca ({filteredUsers.length})</h3>
 
             {filteredUsers.length > 0 ? (
               <div className="results-with-pagination">
@@ -290,30 +293,34 @@ function LoanCreationForm() {
                       onPrevPage={handlePrevPage}
                       onNextPage={handleNextPage}
                     />
+                    <div className="form-actions">
+                      <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="btn btn-secondary"
+                        disabled={submitting}
+                      >
+                        Cancel·lar
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        disabled={submitting || !selectedUser}
+                        onClick={handleSubmit}
+                      >
+                        {submitting ? "Creant préstec..." : "Crear préstec"}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
               <div className="no-results">
-                <p>No se encontraron usuarios con ese criterio de búsqueda.</p>
+                <p>No s'han trobat usuaris amb aquest criteri de cerca.</p>
               </div>
             )}
           </div>
         )}
-
-        <div className="form-actions">
-          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary" disabled={submitting}>
-            Cancelar
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            disabled={submitting || !selectedUser}
-            onClick={handleSubmit}
-          >
-            {submitting ? "Creando préstamo..." : "Crear préstamo"}
-          </button>
-        </div>
       </div>
     </div>
   );

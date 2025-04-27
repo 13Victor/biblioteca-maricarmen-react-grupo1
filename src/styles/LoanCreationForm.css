@@ -99,7 +99,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
+  padding: 1rem;
 }
 
 .user-card {
@@ -136,10 +136,10 @@
 /* Pagination wrapper */
 .pagination-wrapper {
   display: flex;
-  justify-content: center;
+  align-items: center;
   margin-top: var(--spacing-lg);
+  justify-content: space-between;
 }
-
 .no-results {
   padding: 2rem;
   text-align: center;
@@ -150,9 +150,8 @@
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-self: flex-end;
   gap: 1rem;
-  margin-top: 2rem;
 }
 
 .btn {
