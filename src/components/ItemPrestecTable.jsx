@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext } from "react";
 import { getExemplarsByItem } from "../services/api";
 import Pagination from "./Pagination";
 import "../styles/Table.css";
@@ -12,7 +12,7 @@ function ItemPrestecTable({ bookId }) {
 
   // Properly access the isBibliotecari from context
   const { isBilbiotecari } = useContext(AuthContext);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Show 10 exemplars per page
@@ -108,17 +108,15 @@ function ItemPrestecTable({ bookId }) {
             <tr key={exemplar.id}>
               <td>{exemplar.registre || "Sin registro"}</td>
               <td>
-                <span className={getStatusClass(exemplar)}>
-                  {getStatusText(exemplar)}
-                </span>
+                <span className={getStatusClass(exemplar)}>{getStatusText(exemplar)}</span>
               </td>
               {/* Fix the variable name here - it was a typo */}
               {isBilbiotecari && (
                 <td>
                   {!exemplar.baixa && !exemplar.exclos_prestec && (
-                    <Link 
-                      to={`/crear-prestamo/${exemplar.id}`} 
-                      className="btn btn-primary btn-sm"
+                    <Link
+                      to={`/crear-prestamo/${exemplar.id}`}
+                      className="button_prestec"
                       onClick={(e) => {
                         // Add a click event to debug
                         console.log(`Navigating to /crear-prestamo/${exemplar.id}`);
@@ -133,7 +131,7 @@ function ItemPrestecTable({ bookId }) {
           ))}
         </tbody>
       </table>
-      
+
       {totalPages > 1 && (
         <div className="pagination-wrapper">
           <Pagination
