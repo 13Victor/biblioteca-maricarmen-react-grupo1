@@ -1,0 +1,192 @@
+.loan-form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.loan-form-container.fullscreen {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 2rem;
+  border-radius: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.loan-form-content {
+  margin: 0 auto;
+}
+
+.loan-form-content h2,
+.loan-form-content h3 {
+  margin-bottom: var(--spacing-xl);
+}
+
+.loan-form-container.loading,
+.loan-form-container.error,
+.loan-form-container.success {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.loan-form-container.error {
+  color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.loan-form-container.success {
+  color: var(--success-color);
+  background-color: var(--success-bg);
+}
+
+.exemplar-info {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: var(--grey-light);
+  border-radius: 4px;
+  border-left: 4px solid var(--darkblue);
+}
+
+/* Search section styles */
+.search-section {
+  margin-bottom: 2rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-input-container {
+  flex: 1;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: var(--border-width) solid var(--grey-light);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.search-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--darkblue);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.search-button:hover {
+  background-color: var(--darkblue-accent);
+}
+
+.search-button:disabled {
+  background-color: var(--disabled-bg);
+  cursor: not-allowed;
+}
+
+/* User Grid Styles - Using catalog styling */
+.user-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.user-card {
+  position: relative;
+  height: auto;
+  border: var(--border-width) solid var(--grey-light);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.user-card:hover {
+  transform: none;
+}
+
+.user-card.selected {
+  border-color: var(--darkblue);
+  background-color: rgba(44, 67, 145, 0.05);
+  box-shadow: 0 2px 8px rgba(44, 67, 145, 0.3);
+}
+
+.user-card .selection-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--darkblue);
+  font-size: 1.2rem;
+}
+
+/* Pagination wrapper */
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  justify-content: space-between;
+}
+.no-results {
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--grey-light);
+  border-radius: 4px;
+  color: var(--grey-dark);
+}
+
+.form-actions {
+  display: flex;
+  justify-self: flex-end;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--darkblue);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: var(--darkblue-accent);
+}
+
+.btn-primary:disabled {
+  background-color: var(--disabled-bg);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: var(--grey);
+  color: var(--white);
+}
+
+.btn-secondary:hover {
+  background-color: var(--grey-dark);
+}
+
+.btn-secondary:disabled {
+  background-color: var(--disabled-bg);
+  cursor: not-allowed;
+}

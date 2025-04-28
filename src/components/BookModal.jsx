@@ -1,7 +1,12 @@
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import placeholderImg from "../assets/placeholder.png";
+import ItemPrestecTable from "./ItemPrestecTable";
 import "../styles/modal.css";
 
 function BookModal({ book, onClose }) {
+  const { isBilbiotecari } = useContext(AuthContext);
+  
   if (!book) return null;
 
   // Format date safely
@@ -80,6 +85,7 @@ function BookModal({ book, onClose }) {
         return null;
     }
   };
+
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -176,6 +182,12 @@ function BookModal({ book, onClose }) {
                     {tag.nom}
                   </span>
                 ))}
+              </div>
+            )}
+            
+            {isBilbiotecari && (
+              <div className="info-section exemplars-center">
+                <ItemPrestecTable bookId={book.id} />
               </div>
             )}
           </div>

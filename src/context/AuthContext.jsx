@@ -53,7 +53,11 @@ export const AuthProvider = ({ children }) => {
         setErrorProfile("No s'ha trobat cap usuari. Si us plau, inicia sessió.");
         return;
       }
-      fetch("/api/usuari/", {
+
+      // Usar la misma base URL que en api.js
+      const API_BASE_URL = "http://localhost:8000/api";
+
+      fetch(`${API_BASE_URL}/usuari/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,6 +71,9 @@ export const AuthProvider = ({ children }) => {
         })
         .then((data) => {
           setUsuari(data);
+          // IMPORTANT: Store user data in sessionStorage for access across routes
+          sessionStorage.setItem("userData", JSON.stringify(data));
+          console.log("User data stored in session:", data);
         })
         .catch((error) => {
           console.error("Error al obtenir les dades:", error);
