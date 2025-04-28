@@ -159,7 +159,7 @@ input[type="text"],
 input[type="number"],
 input[type="password"],
 input[type="email"],
-input[type="tel"]   {
+input[type="tel"],
 input[type="password"] {
   width: 100%;
   padding: var(--spacing-lg);

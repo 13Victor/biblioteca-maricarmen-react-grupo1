@@ -27,13 +27,14 @@
 }
 
 /* ===== BOTÓN CERRAR ===== */
-.modal-close {
+
+.modal-close i {
   position: absolute;
+  color: var(--darkblue);
   padding: 0;
   right: var(--spacing-lg, 10px);
   top: var(--spacing-md, 8px);
   font-size: 1.5rem;
-  color: var(--color-darkblue, #350092);
   background: none;
   border: none;
   cursor: pointer;

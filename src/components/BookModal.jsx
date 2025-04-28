@@ -6,7 +6,7 @@ import "../styles/modal.css";
 
 function BookModal({ book, onClose }) {
   const { isBilbiotecari } = useContext(AuthContext);
-  
+
   if (!book) return null;
 
   // Format date safely
@@ -86,12 +86,11 @@ function BookModal({ book, onClose }) {
     }
   };
 
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>
-          &times;
+          <i class="fa-solid fa-xmark"></i>
         </button>
 
         <div className="modal-grid">
@@ -184,7 +183,7 @@ function BookModal({ book, onClose }) {
                 ))}
               </div>
             )}
-            
+
             {isBilbiotecari && (
               <div className="info-section exemplars-center">
                 <ItemPrestecTable bookId={book.id} />
