@@ -1,5 +1,5 @@
 // API base URL - ajusta según tu configuración
-const API_BASE_URL = "https://biblioteca1.ieti.site/api";
+const API_BASE_URL = "http://localhost:8000/api";
 
 // Función para obtener libros
 export const getBooks = async () => {
@@ -29,20 +29,9 @@ export const getExemplars = async () => {
   }
 };
 
-// Función para obtener ejemplares por item de catálogo
 export const getExemplarsByItem = async (itemId) => {
   try {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-      console.error("No hay token de autenticación");
-      return [];
-    }
-
-    const response = await fetch(`${API_BASE_URL}/exemplars/by-item/${itemId}/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(`${API_BASE_URL}/exemplars/by-item/${itemId}`);
 
     if (!response.ok) {
       throw new Error(`Error al obtener ejemplares del item (${response.status})`);

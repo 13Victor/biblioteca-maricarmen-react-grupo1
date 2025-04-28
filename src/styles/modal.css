@@ -28,6 +28,10 @@
 
 /* ===== BOTÓN CERRAR ===== */
 
+.modal-close {
+  background-color: transparent;
+}
+
 .modal-close i {
   position: absolute;
   color: var(--darkblue);
@@ -92,4 +96,15 @@
   .modal-image {
     text-align: center;
   }
+}
+
+/* Estilos para la disponibilidad por centros */
+.centres-availability {
+  margin-top: 10px;
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.centre-availability {
+  display: inline-block;
 }
