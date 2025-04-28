@@ -145,8 +145,21 @@ export const createLoan = async (loanData) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.mensaje || `Error al crear el préstamo (${response.status})`);
+      let errorMessage = "Error al crear el préstamo";
+
+      try {
+        const errorData = await response.json();
+        if (errorData.error) {
+          errorMessage = errorData.error;
+        } else if (errorData.mensaje) {
+          errorMessage = errorData.mensaje;
+        }
+      } catch (parseError) {
+        console.error("Error parsing error response:", parseError);
+        errorMessage = `Error al crear el préstamo (${response.status})`;
+      }
+
+      throw new Error(errorMessage);
     }
 
     return await response.json();

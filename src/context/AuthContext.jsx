@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isBilbiotecari, setIsBilbiotecari] = useState(false);
   const [isAdministrador, setIsAdministrador] = useState(false);
   const [errorProfile, setErrorProfile] = useState(null);
+  const [userCentre, setUserCentre] = useState(null);
 
   // Estado para controlar la visibilidad del perfil
   const [mostrarPerfil, setMostrarPerfil] = useState(false);
@@ -74,6 +75,18 @@ export const AuthProvider = ({ children }) => {
           // IMPORTANT: Store user data in sessionStorage for access across routes
           sessionStorage.setItem("userData", JSON.stringify(data));
           console.log("User data stored in session:", data);
+
+          // Set user center information - handle both object and string formats
+          if (data.centre) {
+            // Ensure we have a proper object with id and nom
+            const centreInfo =
+              typeof data.centre === "object" && data.centre !== null ? data.centre : { id: null, nom: data.centre };
+
+            setUserCentre(centreInfo);
+            console.log("Setting user centre:", centreInfo);
+          } else {
+            setUserCentre(null);
+          }
         })
         .catch((error) => {
           console.error("Error al obtenir les dades:", error);
@@ -100,6 +113,7 @@ export const AuthProvider = ({ children }) => {
         mostrarLogin,
         setMostrarLogin,
         handleLogOut,
+        userCentre,
       }}
     >
       {children}
