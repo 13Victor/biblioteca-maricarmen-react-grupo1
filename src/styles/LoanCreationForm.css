@@ -51,6 +51,16 @@
   border-left: 4px solid var(--darkblue);
 }
 
+.exemplar-info p {
+  display: inline-block;
+  margin-right: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.exemplar-info strong {
+  margin-right: 0.25rem;
+}
+
 /* Search section styles */
 .search-section {
   margin-bottom: 2rem;
@@ -138,8 +148,9 @@
   display: flex;
   align-items: center;
   margin-top: var(--spacing-lg);
-  justify-content: space-between;
+  justify-content: center; /* Changed from space-between to center */
 }
+
 .no-results {
   padding: 2rem;
   text-align: center;
@@ -150,8 +161,10 @@
 
 .form-actions {
   display: flex;
-  justify-self: flex-end;
+  justify-content: flex-end; /* Ensure buttons are aligned to the right */
   gap: 1rem;
+  margin-top: var(--spacing-lg); /* Add margin at the top */
+  margin-left: auto; /* Push to the right */
 }
 
 .btn {
