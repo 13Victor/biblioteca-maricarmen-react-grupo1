@@ -116,7 +116,7 @@ h1 {
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
   background-color: var(--darkblue);
-  color: var(--white);
+  color: var(--button-color);
   text-align: center;
   letter-spacing: 2px;
   text-transform: uppercase;
