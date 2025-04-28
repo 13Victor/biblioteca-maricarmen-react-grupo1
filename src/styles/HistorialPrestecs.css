@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: var(--spacing-2xl) var(--spacing-5xl);
   height: 100%;
 }
 
@@ -28,7 +29,7 @@
   border-bottom: 1px solid #ccc;
   text-align: start;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   min-height: 48px;
 }
 
@@ -69,6 +70,7 @@
   color: var(--warning-color);
   border: 1px solid var(--warning-accent);
 }
+
 
 .pagination-number {
   border-radius: var(--border-radius-md);

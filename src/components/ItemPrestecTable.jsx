@@ -108,7 +108,7 @@ function ItemPrestecTable({ bookId }) {
   };
 
   return (
-    <div id="historial-prestecs-container">
+    <div id="exemplars-disponibles-container">
       <h3>Exemplars disponibles ({exemplars.length})</h3>
       <table>
         <thead>

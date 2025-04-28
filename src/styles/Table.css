@@ -1,4 +1,4 @@
-#historial-prestecs-container {
+#exemplars-disponibles-container {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -6,29 +6,29 @@
   padding-top: var(--spacing-2xl);
 }
 
-#historial-prestecs-container h3 {
+#exemplars-disponibles-container h3 {
   margin-bottom: var(--spacing-md);
 }
 
-#historial-prestecs-container table {
+#exemplars-disponibles-container table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
 }
 
-#historial-prestecs-container table tr {
+#exemplars-disponibles-container table tr {
   border-bottom: 1px solid #ccc;
   text-align: start;
 }
 
-#historial-prestecs-container table th {
+#exemplars-disponibles-container table th {
   font-weight: 700;
   padding: var(--spacing-md);
   background-color: var(--darkblue);
   color: var(--white);
 }
 
-#historial-prestecs-container table tr th,
+#exemplars-disponibles-container table tr th,
 td {
   justify-content: start;
   align-items: flex-start;
