@@ -133,7 +133,7 @@ export default function PerfilUsuari() {
         </div>
         <div>
           <strong>Centre: </strong>
-          {usuari.centre.nom}
+          {typeof usuari.centre === "object" ? usuari.centre.nom : usuari.centre}
         </div>
         <div>
           <strong>Grup: </strong>
