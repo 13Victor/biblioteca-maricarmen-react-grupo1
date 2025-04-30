@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   // Función para cerrar sesión
   const handleLogOut = () => {
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userData");
     setUsuari(null);
     setIsLogged(false);
     setIsAdministrador(false);
