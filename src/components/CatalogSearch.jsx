@@ -40,7 +40,7 @@ function CatalogSearch({ onSearchResults }) {
         const data = await searchSuggestions(debouncedSearchQuery);
         setSuggestions(data);
       } catch (error) {
-        console.error("Error al obtener sugerencias:", error);
+        console.error("Error al obtindre suggeriments:", error);
       } finally {
         setIsLoading(false);
       }
@@ -95,7 +95,7 @@ function CatalogSearch({ onSearchResults }) {
       // incluso cuando no hay resultados
       onSearchResults(results, true);
     } catch (error) {
-      console.error("Error en la búsqueda:", error);
+      console.error("Error en la cerca:", error);
       onSearchResults([], true);
     } finally {
       setIsLoading(false);
@@ -117,7 +117,7 @@ function CatalogSearch({ onSearchResults }) {
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => searchQuery.trim() !== "" && setShowSuggestions(true)}
-            placeholder="Buscar en el catálogo..."
+            placeholder="Cerca al catàleg..."
             className="search-input"
           />
 
@@ -139,7 +139,7 @@ function CatalogSearch({ onSearchResults }) {
               <div className="spinner"></div>
             </div>
           ) : (
-            "Buscar"
+            "Cercar"
           )}
         </button>
       </form>
