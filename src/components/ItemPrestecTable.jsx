@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext } from "react";
 import { getExemplarsByItem } from "../services/api";
 import Pagination from "./Pagination";
 import "../styles/Table.css";
@@ -12,7 +12,7 @@ function ItemPrestecTable({ bookId }) {
 
   // Properly access the isBibliotecari from context
   const { isBilbiotecari } = useContext(AuthContext);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Show 10 exemplars per page
@@ -27,7 +27,7 @@ function ItemPrestecTable({ bookId }) {
         setTotalPages(Math.ceil(data.length / itemsPerPage));
         setError(null);
       } catch (err) {
-        setError("Error al cargar los ejemplares");
+        setError("Error al carregar els exemplars");
         console.error(err);
       } finally {
         setLoading(false);
@@ -39,9 +39,9 @@ function ItemPrestecTable({ bookId }) {
     }
   }, [bookId, itemsPerPage]);
 
-  if (loading) return <p>Cargando ejemplares...</p>;
+  if (loading) return <p>Carregant exemplars...</p>;
   if (error) return <p className="error-message">{error}</p>;
-  if (exemplars.length === 0) return <p>No hay ejemplares disponibles en tu centro para este ítem.</p>;
+  if (exemplars.length === 0) return <p>No hi ha exemplars disponibles per a aquest ítem.</p>;
 
   const getStatusClass = (exemplar) => {
     if (exemplar.baixa) return "estat-pill baixa";
@@ -50,8 +50,8 @@ function ItemPrestecTable({ bookId }) {
   };
 
   const getStatusText = (exemplar) => {
-    if (exemplar.baixa) return "De baja";
-    if (exemplar.exclos_prestec) return "Excluido de préstamo";
+    if (exemplar.baixa) return "De baixa";
+    if (exemplar.exclos_prestec) return "Exclòs de préstec";
     return "Disponible";
   };
 
@@ -94,37 +94,36 @@ function ItemPrestecTable({ bookId }) {
 
   return (
     <div id="historial-prestecs-container">
-      <h3>Ejemplares en tu centro ({exemplars.length})</h3>
+      <h3>Exemplars disponibles ({exemplars.length})</h3>
       <table>
         <thead>
           <tr>
-            <th>Registro</th>
-            <th>Estado</th>
-            {isBilbiotecari && <th>Acciones</th>}
+            <th>Registre</th>
+            <th>Centre</th>
+            <th>Estat</th>
+            {isBilbiotecari && <th>Accions</th>}
           </tr>
         </thead>
         <tbody>
           {currentExemplars.map((exemplar) => (
             <tr key={exemplar.id}>
-              <td>{exemplar.registre || "Sin registro"}</td>
+              <td>{exemplar.registre || "Sense registre"}</td>
+              <td>{exemplar.centre?.nom || "Sense centre"}</td>
               <td>
-                <span className={getStatusClass(exemplar)}>
-                  {getStatusText(exemplar)}
-                </span>
+                <span className={getStatusClass(exemplar)}>{getStatusText(exemplar)}</span>
               </td>
-              {/* Fix the variable name here - it was a typo */}
               {isBilbiotecari && (
                 <td>
                   {!exemplar.baixa && !exemplar.exclos_prestec && (
-                    <Link 
-                      to={`/crear-prestamo/${exemplar.id}`} 
-                      className="btn btn-primary btn-sm"
+                    <Link
+                      to={`/crear-prestamo/${exemplar.id}`}
+                      className="button_prestec"
                       onClick={(e) => {
                         // Add a click event to debug
                         console.log(`Navigating to /crear-prestamo/${exemplar.id}`);
                       }}
                     >
-                      Hacer préstamo
+                      Fer préstec
                     </Link>
                   )}
                 </td>
@@ -133,7 +132,7 @@ function ItemPrestecTable({ bookId }) {
           ))}
         </tbody>
       </table>
-      
+
       {totalPages > 1 && (
         <div className="pagination-wrapper">
           <Pagination

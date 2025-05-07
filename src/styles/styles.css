@@ -116,7 +116,7 @@ h1 {
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
   background-color: var(--darkblue);
-  color: var(--white);
+  color: var(--button-color);
   text-align: center;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -157,7 +157,7 @@ label,
 /*MARK: Inputs*/
 input[type="text"],
 input[type="number"],
-input[type="password"]{
+input[type="password"] {
   width: 100%;
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-md);
@@ -186,8 +186,10 @@ input[type="submit"] {
 
 /*MARK: Botones*/
 button,
-input[type="submit"] {
+input[type="submit"],
+.button_prestec {
   background-color: var(--darkblue);
+  text-decoration: none;
   color: var(--button-color) !important;
   border: none;
   padding: var(--spacing-lg) var(--spacing-xl);

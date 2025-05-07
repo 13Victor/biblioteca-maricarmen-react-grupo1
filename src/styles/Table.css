@@ -1,66 +1,64 @@
-#historial-prestecs-container{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding-top: var(--spacing-2xl) ;
+#historial-prestecs-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: var(--spacing-2xl);
 }
 
 #historial-prestecs-container h3 {
-    margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
-#historial-prestecs-container table{
-
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
+#historial-prestecs-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
 }
 
 #historial-prestecs-container table tr {
-    border-bottom: 1px solid #ccc;
-    text-align: start;
+  border-bottom: 1px solid #ccc;
+  text-align: start;
 }
 
 #historial-prestecs-container table th {
-    font-size: var(--font-size-lg);
-    font-weight: 700;
-    padding: var(--spacing-md);
-    background-color: var(--darkblue);
-    color: var(--white);
+  font-weight: 700;
+  padding: var(--spacing-md);
+  background-color: var(--darkblue);
+  color: var(--white);
 }
 
-#historial-prestecs-container table tr th,td {
-    justify-content: start;
-    align-items: flex-start;
-    text-align: start;
-    padding: var(--spacing-md);
+#historial-prestecs-container table tr th,
+td {
+  justify-content: start;
+  align-items: flex-start;
+  text-align: start;
+  padding: var(--spacing-md);
 }
-
 
 .estat-pill {
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: inline-block;
-    text-align: center;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
 }
 
 .estat-pill.retornat {
-    background-color: var(--success-bg);
-    color: var(--success-color);
-    border: 1px solid var(--success-accent);
+  background-color: var(--success-bg);
+  color: var(--success-color);
+  border: 1px solid var(--success-accent);
 }
 
 .estat-pill.pendent {
-    background-color: var(--warning-bg);
-    color: var(--warning-color);
-    border: 1px solid var(--warning-accent);
+  background-color: var(--warning-bg);
+  color: var(--warning-color);
+  border: 1px solid var(--warning-accent);
 }
 
 .estat-pill.baixa {
-    background-color: var(--danger-bg);
-    color: var(--danger-color);
-    border: 1px solid var(--danger-accent);
+  background-color: var(--danger-bg);
+  color: var(--danger-color);
+  border: 1px solid var(--danger-accent);
 }

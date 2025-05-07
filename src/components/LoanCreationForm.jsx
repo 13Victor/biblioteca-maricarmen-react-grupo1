@@ -2,23 +2,30 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getExemplarById, getAvailableUsers, createLoan } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import Pagination from "./Pagination";
 import "../styles/LoanCreationForm.css";
 
 function LoanCreationForm() {
   const { exemplarId } = useParams();
   const navigate = useNavigate();
   const { isBilbiotecari, isLogged } = useContext(AuthContext);
-  
+
   const [exemplar, setExemplar] = useState(null);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const [totalPages, setTotalPages] = useState(0);
 
   // Debug access state
   console.log("LoanCreationForm - Auth state:", { isLogged, isBilbiotecari, exemplarId });
@@ -27,7 +34,7 @@ function LoanCreationForm() {
   useEffect(() => {
     const userData = sessionStorage.getItem("userData");
     console.log("LoanCreationForm - userData from sessionStorage:", userData ? JSON.parse(userData) : null);
-    
+
     // If userData isn't in sessionStorage, try to get it from the context and store it
     if (!userData && usuari) {
       console.log("Storing userData from context", usuari);
@@ -35,53 +42,59 @@ function LoanCreationForm() {
     }
   }, []);
 
-  // Load exemplar and users data
+  // Calculate total pages when filtered users change
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
+    // Reset to first page when new search results arrive
+    setCurrentPage(1);
+  }, [filteredUsers, itemsPerPage]);
+
+  // Load exemplar data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         console.log("Fetching data with:", { exemplarId, isLogged, isBilbiotecari });
-        
+
         if (!exemplarId) {
           throw new Error("ID de ejemplar no proporcionado");
         }
-        
+
         // This part is crucial - get the token directly
         const token = sessionStorage.getItem("token");
         console.log("Token available:", !!token);
-        
+
         if (!token) {
           throw new Error("No hay token de autenticación. Debes iniciar sesión.");
         }
-        
+
         // Get exemplar details - handle API errors more carefully
         try {
           console.log("Fetching exemplar with ID:", exemplarId);
           const exemplarData = await getExemplarById(exemplarId);
           console.log("Exemplar data received:", exemplarData);
-          
+
           if (!exemplarData) {
             throw new Error("Ejemplar no encontrado");
           }
-          
+
           // Check if exemplar is available for loan
           if (exemplarData.baixa || exemplarData.exclos_prestec) {
             throw new Error("Este ejemplar no está disponible para préstamo");
           }
-          
+
           setExemplar(exemplarData);
         } catch (err) {
           console.error("Error fetching exemplar:", err);
           throw new Error(`Error al obtener el ejemplar: ${err.message}`);
         }
-        
-        // Get available users - handle API errors more carefully
+
+        // Load all users initially - don't filter by center
         try {
-          console.log("Fetching available users");
+          console.log("Fetching all available users");
           const usersData = await getAvailableUsers();
           console.log("Users data received:", usersData);
           setUsers(usersData);
-          setFilteredUsers(usersData);
         } catch (err) {
           console.error("Error fetching users:", err);
           throw new Error(`Error al obtener usuarios: ${err.message}`);
@@ -97,130 +110,218 @@ function LoanCreationForm() {
     fetchData();
   }, [exemplarId, isLogged, isBilbiotecari]);
 
-  // Filter users based on search term
-  useEffect(() => {
+  // Handle user search
+  const handleSearch = () => {
+    setIsSearching(true);
+
+    // Search only if there's a search term
     if (searchTerm.trim() === "") {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter(user => 
-        (user.username?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (user.first_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (user.last_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (user.email?.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-      setFilteredUsers(filtered);
+      setFilteredUsers([]);
+      setHasSearched(true);
+      setIsSearching(false);
+      return;
     }
-  }, [searchTerm, users]);
+
+    // Filter users regardless of center
+    const filtered = users.filter(
+      (user) =>
+        user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredUsers(filtered);
+    setHasSearched(true);
+    setIsSearching(false);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    handleSearch();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("Creating loan with:", {
       usuari_id: selectedUser,
       exemplar_id: exemplarId,
-      anotacions: notes
     });
-    
+
     if (!selectedUser) {
-      setError("Debes seleccionar un usuario");
+      setError("Has de seleccionar un usuari");
       return;
     }
-    
+
     try {
       setSubmitting(true);
       await createLoan({
         usuari_id: selectedUser,
         exemplar_id: exemplarId,
-        anotacions: notes || ""
+        anotacions: "",
       });
-      
+
       setSuccess(true);
       setTimeout(() => {
         navigate(-1); // Go back after successful creation
       }, 2000);
     } catch (err) {
-      setError(err.message || "Error al crear el préstamo");
+      setError(err.message || "Error al crear el préstec");
       console.error(err);
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) return <div className="loan-form-container loading">Cargando datos...</div>;
-  if (error) return <div className="loan-form-container error">{error}</div>;
-  if (success) return <div className="loan-form-container success">¡Préstamo creado correctamente!</div>;
+  // Get current users for the page
+  const getCurrentUsers = () => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  };
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleFirstPage = () => {
+    setCurrentPage(1);
+  };
+
+  const handleLastPage = () => {
+    setCurrentPage(totalPages);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  if (loading) return <div className="loan-form-container loading fullscreen">Carregant dades...</div>;
+  if (error) return <div className="loan-form-container error fullscreen">{error}</div>;
+  if (success) return <div className="loan-form-container success fullscreen">Préstec creat correctament!</div>;
+
+  const currentUsers = getCurrentUsers();
 
   return (
-    <div className="loan-form-container">
-      <h2>Crear Préstamo</h2>
-      
-      <div className="exemplar-info">
-        <h3>Información del ejemplar</h3>
-        <p><strong>Título:</strong> {exemplar?.cataleg?.titol}</p>
-        <p><strong>Autor:</strong> {exemplar?.cataleg?.autor || "No especificado"}</p>
-        <p><strong>Registro:</strong> {exemplar?.registre || "Sin registro"}</p>
+    <div className="loan-form-container fullscreen">
+      <div className="loan-form-content">
+        <h2>Crear Préstec</h2>
+
+        <div className="exemplar-info">
+          <h3>Informació de l'exemplar</h3>
+          <p>
+            <strong>Títol:</strong> {exemplar?.cataleg?.titol || "No especificat"}
+          </p>
+          <p>
+            <strong>Autor:</strong> {exemplar?.cataleg?.autor || "No especificat"}
+          </p>
+          <p>
+            <strong>Registre:</strong> {exemplar?.registre || "Sense registre"}
+          </p>
+          <p>
+            <strong>Centre:</strong> {exemplar?.centre?.nom || "No especificat"}
+          </p>
+        </div>
+
+        <div className="search-section">
+          <form onSubmit={handleSearchSubmit} className="search-form">
+            <div className="search-input-container">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Cercar usuari per nom, email o username..."
+                className="search-input"
+              />
+            </div>
+            <button type="submit" className="search-button" disabled={isSearching || searchTerm.trim() === ""}>
+              {isSearching ? "Cercant..." : "Cercar"}
+            </button>
+          </form>
+        </div>
+
+        {hasSearched && (
+          <div className="search-results-container">
+            <h3>Resultats de la cerca ({filteredUsers.length})</h3>
+
+            {filteredUsers.length > 0 ? (
+              <div className="results-with-pagination">
+                <div className="user-results-grid catalog-grid">
+                  {currentUsers.map((user) => (
+                    <div
+                      key={user.id}
+                      className={`user-card catalog-item ${selectedUser === user.id ? "selected" : ""}`}
+                      onClick={() => setSelectedUser(user.id)}
+                    >
+                      <p className="item-title">{`${user.first_name} ${user.last_name}`}</p>
+                      <p className="informative-text item-author">{user.username}</p>
+                      <div className="badgeContainer">
+                        <span className="badge item-type-badge">{user.email}</span>
+                        {user.centre && (
+                          <span className="badge item-status available">
+                            {typeof user.centre === "object" ? user.centre.nom : user.centre}
+                          </span>
+                        )}
+                      </div>
+                      {selectedUser === user.id && (
+                        <div className="selection-indicator">
+                          <i className="fas fa-check"></i>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="pagination-wrapper">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                      onFirstPage={handleFirstPage}
+                      onLastPage={handleLastPage}
+                      onPrevPage={handlePrevPage}
+                      onNextPage={handleNextPage}
+                    />
+                    <div className="form-actions">
+                      <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="btn btn-secondary"
+                        disabled={submitting}
+                      >
+                        Cancel·lar
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        disabled={submitting || !selectedUser}
+                        onClick={handleSubmit}
+                      >
+                        {submitting ? "Creant préstec..." : "Crear préstec"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="no-results">
+                <p>No s'han trobat usuaris amb aquest criteri de cerca.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="user-search">Buscar usuario:</label>
-          <input
-            id="user-search"
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar por nombre, email o usuario..."
-            className="form-control"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="user-select">Seleccionar usuario:</label>
-          <select
-            id="user-select"
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-            className="form-control"
-            required
-          >
-            <option value="">-- Seleccionar usuario --</option>
-            {filteredUsers.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.first_name} {user.last_name} ({user.username}) - {user.centre || "Sin centro"}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="notes">Anotaciones (opcional):</label>
-          <textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="form-control"
-            rows="3"
-          />
-        </div>
-
-        <div className="form-actions">
-          <button 
-            type="button" 
-            onClick={() => navigate(-1)}
-            className="btn btn-secondary"
-            disabled={submitting}
-          >
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            disabled={submitting}
-          >
-            {submitting ? "Creando préstamo..." : "Crear préstamo"}
-          </button>
-        </div>
-      </form>
     </div>
   );
 }
