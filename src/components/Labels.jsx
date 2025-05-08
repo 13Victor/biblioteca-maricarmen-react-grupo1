@@ -7,6 +7,8 @@ import "../styles/Labels.css";
 import jsPDF from "jspdf";
 import JsBarcode from "jsbarcode";
 import { createCanvas } from "canvas";
+// Importar la nueva función
+import { generateLabelsPDF } from "../services/api";
 
 export default function Labels() {
     const { userCentre } = useContext(AuthContext);
@@ -57,100 +59,34 @@ export default function Labels() {
         setCodeQuery("");
     };
 
-    // Función para generar las etiquetas en HTML para impresión
-    const handlePrintLabels = () => {
+    // Reemplazar la función handlePrintLabels con esta implementación:
+    const handlePrintLabels = async () => {
         if (selectedExemplars.length === 0) {
             setError("No hay ejemplares seleccionados para imprimir");
             return;
         }
 
-        // Crear una nueva ventana para impresión
-        const printWindow = window.open("", "_blank");
-        if (!printWindow) {
-            setError("No se pudo abrir la ventana de impresión");
-            return;
+        try {
+            setIsSearching(true); // Reutilizamos este estado para mostrar carga
+
+            // Obtener lista de IDs de ejemplares seleccionados
+            const exemplarIds = selectedExemplars.map((exemplar) => exemplar.id);
+
+            // Llamar al backend para generar el PDF
+            const pdfBlob = await generateLabelsPDF(exemplarIds);
+
+            // Crear una URL para el blob y abrirlo en una nueva ventana
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            window.open(pdfUrl, "_blank");
+
+            // Limpiar la URL del objeto después de un tiempo
+            setTimeout(() => URL.revokeObjectURL(pdfUrl), 30000);
+        } catch (error) {
+            console.error("Error al generar las etiquetas:", error);
+            setError(`Error al generar las etiquetas: ${error.message}`);
+        } finally {
+            setIsSearching(false);
         }
-
-        // Generar contenido HTML para las etiquetas
-        const printContent = `
-            <html>
-            <head>
-                <title>Etiquetas Biblioteca</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 0;
-                        padding: 0;
-                    }
-                    .label-container {
-                        display: grid;
-                        grid-template-columns: repeat(4, 4.8cm); /* 4 columnas de 4.8 cm */
-                        grid-auto-rows: 1.7cm; /* Altura de cada etiqueta */
-                        gap: 0;
-                        width: 21cm; /* Ancho de la hoja DIN A4 */
-                        height: 29.7cm; /* Altura de la hoja DIN A4 */
-                        padding: 0.6cm 0.8cm 0.3cm 0.8cm; /* Márgenes: superior, laterales e inferior */
-                        box-sizing: border-box;
-                    }
-                    .label {
-                        border: 1px solid #000;
-                        padding: 0.2cm;
-                        box-sizing: border-box;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        text-align: center;
-                    }
-                    .label img {
-                        max-width: 100%;
-                        max-height: 50%;
-                    }
-                    .label p {
-                        margin: 0.1cm 0 0;
-                        font-size: 8pt;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="label-container">
-                    ${selectedExemplars
-                        .map((exemplar) => {
-                            const canvas = createCanvas(300, 100);
-                            JsBarcode(canvas, exemplar.registre, {
-                                format: "CODE128",
-                                width: 2,
-                                height: 50,
-                                displayValue: true,
-                            });
-                            const barcodeImg = canvas.toDataURL("image/png");
-
-                            return `
-                                <div class="label">
-                                    <p>${userCentre?.nom || "No especificat"}</p>
-                                    <img src="${barcodeImg}" alt="Código de barras">
-                                    <p>Registre: ${exemplar.registre}</p>
-                                </div>
-                                <div class="label">
-                                    <p>CDU: ${exemplar.CDU || "No especificat"}</p>
-                                </div>
-                            `;
-                        })
-                        .join("")}
-                </div>
-                <script>
-                    window.onload = () => {
-                        window.print();
-                    };
-                </script>
-            </body>
-            </html>
-        `;
-
-        // Escribir el contenido en la nueva ventana
-        printWindow.document.open();
-        printWindow.document.write(printContent);
-        printWindow.document.close();
     };
 
     // Función para realizar la búsqueda

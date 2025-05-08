@@ -250,3 +250,51 @@ export const searchExemplars = async (query) => {
         throw error;
     }
 };
+
+// Función para generar etiquetas PDF desde el backend
+export const generateLabelsPDF = async (exemplarIds) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        console.log("Enviando solicitud para generar etiquetas:", exemplarIds);
+
+        // Configurar la petición correctamente - quita la barra final de la URL
+        const response = await fetch(`${API_BASE_URL}/exemplars/generate-labels`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+                exemplar_ids: exemplarIds,
+            }),
+            credentials: "include",
+            redirect: "follow",
+        });
+
+        console.log("Estado de respuesta:", response.status, response.statusText);
+        console.log("Tipo de contenido:", response.headers.get("content-type"));
+
+        if (!response.ok) {
+            const contentType = response.headers.get("content-type") || "";
+
+            if (contentType.includes("application/json")) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Error al generar etiquetas (${response.status})`);
+            } else {
+                const errorText = await response.text();
+                throw new Error(`Error al generar etiquetas (${response.status}): ${errorText || response.statusText}`);
+            }
+        }
+
+        // Si llegamos aquí, sabemos que la respuesta es OK
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/pdf")) {
+            return await response.blob();
+        } else {
+            throw new Error(`Respuesta inesperada del servidor: ${contentType}`);
+        }
+    } catch (error) {
+        console.error("Error en generateLabelsPDF:", error);
+        throw error;
+    }
+};
