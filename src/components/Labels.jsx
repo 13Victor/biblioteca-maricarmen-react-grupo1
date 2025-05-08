@@ -57,129 +57,100 @@ export default function Labels() {
         setCodeQuery("");
     };
 
-    // Función para generar las etiquetas en PDF
+    // Función para generar las etiquetas en HTML para impresión
     const handlePrintLabels = () => {
         if (selectedExemplars.length === 0) {
             setError("No hay ejemplares seleccionados para imprimir");
             return;
         }
 
-        // Crear un nuevo documento PDF
-        const doc = new jsPDF({
-            orientation: "portrait",
-            unit: "cm",
-            format: "a4",
-        });
+        // Crear una nueva ventana para impresión
+        const printWindow = window.open("", "_blank");
+        if (!printWindow) {
+            setError("No se pudo abrir la ventana de impresión");
+            return;
+        }
 
-        // Dimensiones de la página
-        const pageWidth = 21; // A4 width in cm
-        const pageHeight = 29.7; // A4 height in cm
+        // Generar contenido HTML para las etiquetas
+        const printContent = `
+            <html>
+            <head>
+                <title>Etiquetas Biblioteca</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .label-container {
+                        display: grid;
+                        grid-template-columns: repeat(4, 4.8cm); /* 4 columnas de 4.8 cm */
+                        grid-auto-rows: 1.7cm; /* Altura de cada etiqueta */
+                        gap: 0;
+                        width: 21cm; /* Ancho de la hoja DIN A4 */
+                        height: 29.7cm; /* Altura de la hoja DIN A4 */
+                        padding: 0.6cm 0.8cm 0.3cm 0.8cm; /* Márgenes: superior, laterales e inferior */
+                        box-sizing: border-box;
+                    }
+                    .label {
+                        border: 1px solid #000;
+                        padding: 0.2cm;
+                        box-sizing: border-box;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
+                    }
+                    .label img {
+                        max-width: 100%;
+                        max-height: 50%;
+                    }
+                    .label p {
+                        margin: 0.1cm 0 0;
+                        font-size: 8pt;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="label-container">
+                    ${selectedExemplars
+                        .map((exemplar) => {
+                            const canvas = createCanvas(300, 100);
+                            JsBarcode(canvas, exemplar.registre, {
+                                format: "CODE128",
+                                width: 2,
+                                height: 50,
+                                displayValue: true,
+                            });
+                            const barcodeImg = canvas.toDataURL("image/png");
 
-        // Márgenes (en cm)
-        const marginLeft = 0.5;
-        const marginTop = 0.5;
+                            return `
+                                <div class="label">
+                                    <p>${userCentre?.nom || "No especificat"}</p>
+                                    <img src="${barcodeImg}" alt="Código de barras">
+                                    <p>Registre: ${exemplar.registre}</p>
+                                </div>
+                                <div class="label">
+                                    <p>CDU: ${exemplar.CDU || "No especificat"}</p>
+                                </div>
+                            `;
+                        })
+                        .join("")}
+                </div>
+                <script>
+                    window.onload = () => {
+                        window.print();
+                    };
+                </script>
+            </body>
+            </html>
+        `;
 
-        // Calcular dimensiones efectivas
-        const availableWidth = pageWidth - marginLeft * 2;
-        const availableHeight = pageHeight - marginTop * 2;
-
-        // Ajustar tamaño de etiqueta si es necesario para que quepan en la página
-        const effectiveLabelWidth = availableWidth / LABEL_COLUMNS;
-        const effectiveLabelHeight = availableHeight / LABEL_ROWS;
-
-        let currentPage = 1;
-        let currentRow = 0;
-        let currentCol = 0;
-        let labelIndex = 0;
-
-        // Procesar cada ejemplar y generar sus dos etiquetas
-        selectedExemplars.forEach((exemplar) => {
-            // Por cada ejemplar, generamos dos pares de etiquetas (4 en total)
-            // Dos etiquetas con código de barras y dos con información textual
-            for (let pair = 0; pair < 2; pair++) {
-                // Generar 2 pares idénticos
-                // Primera etiqueta del par: código de barras
-                // Si la página está llena, añadir una nueva
-                if (currentRow >= LABEL_ROWS) {
-                    doc.addPage();
-                    currentPage++;
-                    currentRow = 0;
-                    currentCol = 0;
-                }
-
-                // Calcular la posición de la etiqueta actual
-                const barcodeX = marginLeft + currentCol * effectiveLabelWidth;
-                const barcodeY = marginTop + currentRow * effectiveLabelHeight;
-
-                // Generar el código de barras
-                const canvas = createCanvas(300, 100);
-                JsBarcode(canvas, exemplar.registre, {
-                    format: "CODE128",
-                    width: 2,
-                    height: 50,
-                    displayValue: true,
-                });
-
-                // Convertir el canvas a imagen para insertar en el PDF
-                const imgData = canvas.toDataURL("image/png");
-
-                // Insertar el código de barras en el PDF
-                doc.addImage(
-                    imgData,
-                    "PNG",
-                    barcodeX + 0.5, // margen interno horizontal
-                    barcodeY + 0.5, // margen interno vertical
-                    effectiveLabelWidth - 1, // ancho de imagen (con margen interno)
-                    effectiveLabelHeight - 1.5 // altura de imagen (con margen interno)
-                );
-
-                // Añadir texto descriptivo
-                doc.setFontSize(10);
-                doc.text(`Título: ${exemplar.titol}`, barcodeX + 0.5, barcodeY + effectiveLabelHeight - 0.7);
-
-                // Dibujar el borde de la etiqueta
-                doc.rect(barcodeX, barcodeY, effectiveLabelWidth, effectiveLabelHeight);
-
-                // Avanzar a la siguiente posición
-                currentCol++;
-                if (currentCol >= LABEL_COLUMNS) {
-                    currentCol = 0;
-                    currentRow++;
-                }
-                labelIndex++;
-
-                // Segunda etiqueta del par: información del registro
-                // Si la página está llena, añadir una nueva
-                if (currentRow >= LABEL_ROWS) {
-                    doc.addPage();
-                    currentPage++;
-                    currentRow = 0;
-                    currentCol = 0;
-                }
-
-                // Calcular la posición de la etiqueta actual
-                const infoX = marginLeft + currentCol * effectiveLabelWidth;
-                const infoY = marginTop + currentRow * effectiveLabelHeight;
-
-                // Segunda etiqueta: información del registro
-                doc.setFontSize(12);
-                doc.text(`Registre: ${exemplar.registre}`, infoX + 0.5, infoY + 1);
-
-                // Dibujar el borde de la etiqueta
-                doc.rect(infoX, infoY, effectiveLabelWidth, effectiveLabelHeight);
-
-                // Avanzar a la siguiente posición
-                currentCol++;
-                if (currentCol >= LABEL_COLUMNS) {
-                    currentCol = 0;
-                    currentRow++;
-                }
-                labelIndex++;
-            }
-        });
-
-        // Guardar el PDF
-        doc.save("etiquetas_biblioteca.pdf");
+        // Escribir el contenido en la nueva ventana
+        printWindow.document.open();
+        printWindow.document.write(printContent);
+        printWindow.document.close();
     };
 
     // Función para realizar la búsqueda
