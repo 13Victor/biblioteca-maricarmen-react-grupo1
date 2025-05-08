@@ -4,36 +4,34 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 function Aside() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
     const { isLogged, usuari } = useContext(AuthContext);
-  
+
     return (
-      <aside className="aside-container">
-          <div id="aside-default-content">
-          {/* Botón Catàleg siempre visible */}
-          <button onClick={() => navigate('/cataleg')}>
-            Catàleg
-          </button>
-  
-          {/* Historial solo visible si está logueado */}
-          {isLogged && !usuari?.is_admin && !usuari?.is_staff && (
-            <button onClick={() => navigate('/historial-prestecs')} >Historial</button>
-          )}
-          </div>
-  
-          <div id="aside-admin-content">
-          {/* Botones visibles solo si es admin O bibliotecari */}
-          {isLogged && (usuari?.is_admin || usuari?.is_staff) && (
-            <>
-              <button onClick={() => navigate('/csv-importacio')}>
-                Importar Usuaris
-              </button>
-              <button onClick={() => (window.location.href = '/admin')}>Panell d'Administració</button>
-            </>
-          )}
-          </div>
-      </aside>
+        <aside className="aside-container">
+            <div id="aside-default-content">
+                {/* Botón Catàleg siempre visible */}
+                <button onClick={() => navigate("/cataleg")}>Catàleg</button>
+                <button onClick={() => navigate("/etiquetes")}>Impresió Etiquetes</button>
+
+                {/* Historial solo visible si está logueado */}
+                {isLogged && !usuari?.is_admin && !usuari?.is_staff && (
+                    <button onClick={() => navigate("/historial-prestecs")}>Historial</button>
+                )}
+            </div>
+
+            <div id="aside-admin-content">
+                {/* Botones visibles solo si es admin O bibliotecari */}
+                {isLogged && (usuari?.is_admin || usuari?.is_staff) && (
+                    <>
+                        <button onClick={() => navigate("/csv-importacio")}>Importar Usuaris</button>
+                        {/* <button onClick={() => navigate("/etiquetes")}>Impresió Etiquetes</button> */}
+                        <button onClick={() => (window.location.href = "/admin")}>Panell d'Administració</button>
+                    </>
+                )}
+            </div>
+        </aside>
     );
-  }
+}
 
 export default Aside;
