@@ -21,6 +21,41 @@ export default function PerfilUsuari() {
     }
   }, [usuari]);
 
+  // Añadir método para cargar datos del usuario
+  useEffect(() => {
+    // Si tenemos token pero el usuario no tiene todos los datos cargados, intentar recargarlos
+    const checkUserData = async () => {
+      if (usuari && (!usuari.first_name || !usuari.last_name) && sessionStorage.getItem("token")) {
+        try {
+          const response = await fetch("http://localhost:8000/api/usuari/", {
+            headers: {
+              "Authorization": `Bearer ${sessionStorage.getItem("token")}`,
+            },
+          });
+          
+          if (response.ok) {
+            const updatedUserData = await response.json();
+            // Actualizar datos locales
+            Object.assign(usuari, updatedUserData);
+            // Actualizar también en sessionStorage
+            sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
+            
+            // Actualizar el formulario de edición
+            setEditedData({
+              email: updatedUserData.email || "",
+              first_name: updatedUserData.first_name || "",
+              last_name: updatedUserData.last_name || "",
+            });
+          }
+        } catch (error) {
+          console.error("Error al cargar datos actualizados:", error);
+        }
+      }
+    };
+    
+    checkUserData();
+  }, [usuari]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedData({ ...editedData, [name]: value });
