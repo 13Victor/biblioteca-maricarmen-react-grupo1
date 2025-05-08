@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Pagination from "./Pagination";
+import ExemplarSearch from "./ExemplarSearch";
 import "../styles/Labels.css";
 // PDF
 import jsPDF from "jspdf";
@@ -31,8 +32,7 @@ export default function Labels() {
     const LABEL_HEIGHT_CM = 5;
 
     // Manejar cambios en el campo de búsqueda
-    const handleTextQueryChange = (e) => {
-        const query = e.target.value;
+    const handleTextQueryChange = (query) => {
         setTextQuery(query);
     };
 
@@ -277,12 +277,9 @@ export default function Labels() {
                             <div className="form-row-grid">
                                 <div className="form-group">
                                     <label htmlFor="text-search">Títol, autor o editorial:</label>
-                                    <input
-                                        type="text"
-                                        id="text-search"
-                                        value={textQuery}
-                                        onChange={handleTextQueryChange}
-                                        placeholder="Introdueix títol, autor o editorial..."
+                                    <ExemplarSearch
+                                        onSearchResults={() => {}} // No actualizar resultados
+                                        onQueryChange={(query) => setTextQuery(query)} // Actualizar textQuery
                                     />
                                 </div>
 
