@@ -17,7 +17,7 @@ function Aside() {
   
           {/* Historial solo visible si está logueado */}
           {isLogged && !usuari?.is_admin && !usuari?.is_staff && (
-            <button >Historial</button>
+            <button onClick={() => navigate('/historial-prestecs')} >Historial</button>
           )}
           </div>
   
@@ -28,7 +28,7 @@ function Aside() {
               <button onClick={() => navigate('/csv-importacio')}>
                 Importar Usuaris
               </button>
-              <button>Panell d'Administració</button>
+              <button onClick={() => (window.location.href = '/admin')}>Panell d'Administració</button>
             </>
           )}
           </div>

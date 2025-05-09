@@ -1,12 +1,62 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import placeholderImg from "../assets/placeholder.png";
 import ItemPrestecTable from "./ItemPrestecTable";
+import { getExemplarsByItem } from "../services/api";
 import "../styles/modal.css";
 
 function BookModal({ book, onClose }) {
   const { isBilbiotecari } = useContext(AuthContext);
-  
+  const {isAdministrador} = useContext(AuthContext);
+  const [exemplarsByCentre, setExemplarsByCentre] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Cargar los ejemplares por centro si tenemos un libro
+    if (book && book.id) {
+      setLoading(true);
+      getExemplarsByItem(book.id)
+        .then((data) => {
+          // Agrupar ejemplares por centro y estado
+          const centreMap = {};
+
+          // Procesar los ejemplares
+          data.forEach((exemplar) => {
+            if (!exemplar.centre) return;
+
+            const centreId = exemplar.centre.id;
+            const centreName = exemplar.centre.nom;
+
+            if (!centreMap[centreId]) {
+              centreMap[centreId] = {
+                nom: centreName,
+                disponible: 0,
+                exclos_prestec: 0,
+                baixa: 0,
+              };
+            }
+
+            // Contar según estado
+            if (exemplar.baixa) {
+              centreMap[centreId].baixa++;
+            } else if (exemplar.exclos_prestec) {
+              centreMap[centreId].exclos_prestec++;
+            } else {
+              centreMap[centreId].disponible++;
+            }
+          });
+
+          setExemplarsByCentre(centreMap);
+        })
+        .catch((error) => {
+          console.error("Error al cargar ejemplares por centro:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [book]);
+
   if (!book) return null;
 
   // Format date safely
@@ -37,6 +87,29 @@ function BookModal({ book, onClose }) {
   const hasExemplarCounts =
     book.exemplar_counts &&
     (book.exemplar_counts.disponible > 0 || book.exemplar_counts.exclos_prestec > 0 || book.exemplar_counts.baixa > 0);
+
+  // Renderizar la disponibilidad por centro
+  const renderCentresAvailability = () => {
+    if (!exemplarsByCentre) return null;
+
+    // Filtrar solo centros con ejemplares disponibles
+    const centresWithAvailable = Object.values(exemplarsByCentre)
+      .filter((centre) => centre.disponible > 0)
+      .sort((a, b) => a.nom.localeCompare(b.nom));
+
+    if (centresWithAvailable.length === 0) return null;
+
+    return (
+      <p className="centres-availability">
+        {centresWithAvailable.map((centre, index) => (
+          <span key={index} className=" item-type-badge centre-availability">
+            {centre.nom}: {centre.disponible}
+            {index < centresWithAvailable.length - 1 ? "    " : ""}
+          </span>
+        ))}
+      </p>
+    );
+  };
 
   // Determinar qué información específica mostrar según el tipo
   const renderTypeSpecificInfo = () => {
@@ -86,12 +159,11 @@ function BookModal({ book, onClose }) {
     }
   };
 
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>
-          &times;
+          <i className="fa-solid fa-xmark"></i>
         </button>
 
         <div className="modal-grid">
@@ -125,7 +197,7 @@ function BookModal({ book, onClose }) {
                         <span className="count">{book.exemplar_counts.exclos_prestec} exemplars</span>
                       </li>
                     )}
-                    {book.exemplar_counts.baixa > 0 && (
+                    {(book.exemplar_counts.baixa > 0 && (isBilbiotecari === true || isAdministrador === true)) && (
                       <li>
                         <span className="badge item-status baixa">De baixa</span>
                         <span className="count">{book.exemplar_counts.baixa} exemplars</span>
@@ -137,6 +209,9 @@ function BookModal({ book, onClose }) {
                     {book.exemplar_counts.disponible + book.exemplar_counts.exclos_prestec + book.exemplar_counts.baixa}{" "}
                     exemplars
                   </p>
+
+                  {/* Nueva sección para mostrar disponibilidad por centro */}
+                  {loading ? <p>Cargando disponibilidad por centros...</p> : renderCentresAvailability()}
                 </div>
               </div>
             )}
@@ -184,7 +259,7 @@ function BookModal({ book, onClose }) {
                 ))}
               </div>
             )}
-            
+
             {isBilbiotecari && (
               <div className="info-section exemplars-center">
                 <ItemPrestecTable bookId={book.id} />

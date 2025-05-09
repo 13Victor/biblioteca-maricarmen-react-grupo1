@@ -63,31 +63,32 @@ export default function Login() {
     useEffect(() => {
         if (!doFetch) return;
 
-        setIsLoading(true);
-        setError(null);
-        fetch("http://localhost:8000/api/token/", {
-            method: "GET",
-            headers: {
-                "Authorization": `Basic ${btoa(username + ":" + password)}`,
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => {
-                if (!response.ok) throw new Error("Usuari o contrassenya incorrectes");
-                return response.json();
-            })
-            .then((data) => {
-                sessionStorage.setItem("token", data.token);
-                setIsLogged(true);
-                setMostrarLogin(false); 
-                setMostrarPerfil(true); 
-            })
-            .catch((err) => setError(err.message))
-            .finally(() => {
-                setIsLoading(false);
-                setDoFetch(false);
-            });
-    }, [doFetch, setIsLogged, setMostrarLogin, setMostrarPerfil]);
+    setIsLoading(true);
+    setError(null);
+    // Usar la URL completa de la API
+    fetch(`${API_BASE_URL}/api/token/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Basic ${btoa(username + ":" + password)}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Usuari o contrassenya incorrectes");
+        return response.json();
+      })
+      .then((data) => {
+        sessionStorage.setItem("token", data.token);
+        setIsLogged(true);
+        setMostrarLogin(false);
+        // setMostrarPerfil(true);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => {
+        setIsLoading(false);
+        setDoFetch(false);
+      });
+  }, [doFetch, setIsLogged, setMostrarLogin, setMostrarPerfil]);
 
     return (
         <div id="login-container">

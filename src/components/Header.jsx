@@ -13,6 +13,7 @@ export default function Header() {
         setMostrarPerfil,
         mostrarLogin,
         setMostrarLogin,
+        usuari,
     } = useContext(AuthContext);
 
     const togglePerfil = () => {
@@ -34,7 +35,11 @@ export default function Header() {
             </button>
           ) : (
             <button id="profile-button" onClick={togglePerfil}>
-              {isAdministrador ? "Perfil Administrador" : isBilbiotecari ? "Perfil Bibliotecari" : "Perfil Usuari"}
+              {isAdministrador 
+                ? `Administrador/a ${usuari?.first_name || ''}` 
+                : isBilbiotecari 
+                  ? `Bibliotecari/a ${usuari?.first_name || ''}` 
+                  : `Usuari/a ${usuari?.first_name || ''}`}
             </button>
           )}
         </div>

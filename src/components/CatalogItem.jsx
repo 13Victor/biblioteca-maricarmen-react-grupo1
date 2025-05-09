@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import BookModal from "./BookModal";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { AuthContext } from "../context/AuthContext";
 
 function CatalogItem({ item }) {
   const [showModal, setShowModal] = useState(false);
+  const { isBilbiotecari } = useContext(AuthContext);
+  const { isAdministrador } = useContext(AuthContext);
 
   // Verificar si tenemos datos de conteo de ejemplares
   const hasExemplarCounts =
@@ -34,7 +37,7 @@ function CatalogItem({ item }) {
                   <span className="badge item-status excluded">{item.exemplar_counts.exclos_prestec}</span>
                 </Tippy>
               )}
-              {item.exemplar_counts.baixa > 0 && (
+              {(item.exemplar_counts.baixa > 0 && (isBilbiotecari === true || isAdministrador === true))&& (
                 <Tippy content="De baja" placement="top">
                   <span className="badge item-status baixa">{item.exemplar_counts.baixa}</span>
                 </Tippy>

@@ -293,26 +293,27 @@ function LoanCreationForm() {
                       onPrevPage={handlePrevPage}
                       onNextPage={handleNextPage}
                     />
-                    <div className="form-actions">
-                      <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="btn btn-secondary"
-                        disabled={submitting}
-                      >
-                        Cancel·lar
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        disabled={submitting || !selectedUser}
-                        onClick={handleSubmit}
-                      >
-                        {submitting ? "Creant préstec..." : "Crear préstec"}
-                      </button>
-                    </div>
                   </div>
                 )}
+
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="btn btn-secondary"
+                    disabled={submitting}
+                  >
+                    Cancel·lar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={submitting || !selectedUser}
+                    onClick={handleSubmit}
+                  >
+                    {submitting ? "Creant préstec..." : "Crear préstec"}
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="no-results">

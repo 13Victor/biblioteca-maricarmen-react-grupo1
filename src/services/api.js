@@ -1,5 +1,5 @@
 // API base URL - ajusta según tu configuración
-const API_BASE_URL = "http://localhost:8000/api"; // Cambiar a la URL de producción cuando sea necesario
+const API_BASE_URL = "http://localhost:8000/api";
 
 // Función para obtener libros
 export const getBooks = async () => {
@@ -29,20 +29,9 @@ export const getExemplars = async () => {
   }
 };
 
-// Función para obtener ejemplares por item de catálogo
 export const getExemplarsByItem = async (itemId) => {
   try {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-      console.error("No hay token de autenticación");
-      return [];
-    }
-
-    const response = await fetch(`${API_BASE_URL}/exemplars/by-item/${itemId}/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(`${API_BASE_URL}/exemplars/by-item/${itemId}`);
 
     if (!response.ok) {
       throw new Error(`Error al obtener ejemplares del item (${response.status})`);
@@ -65,26 +54,26 @@ export const getExemplarById = async (exemplarId) => {
     }
 
     console.log(`Requesting exemplar ${exemplarId} with token`);
-    
+
     const response = await fetch(`${API_BASE_URL}/exemplars/${exemplarId}/`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     });
 
     // Log response details for debugging
     console.log(`Response status: ${response.status}`);
-    
+
     if (response.status === 401) {
       throw new Error("No estás autorizado para ver este ejemplar");
     }
-    
+
     if (response.status === 404) {
       throw new Error("Ejemplar no encontrado");
     }
-    
+
     if (!response.ok) {
       let errorMessage = `Error al obtener el ejemplar (${response.status})`;
       try {
@@ -118,7 +107,7 @@ export const getAvailableUsers = async () => {
     }
 
     console.log(`Requesting available users with token: ${token.substring(0, 10)}...`);
-    
+
     const response = await fetch(`${API_BASE_URL}/usuarios-disponibles/`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -156,8 +145,21 @@ export const createLoan = async (loanData) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.mensaje || `Error al crear el préstamo (${response.status})`);
+      let errorMessage = "Error al crear el préstamo";
+
+      try {
+        const errorData = await response.json();
+        if (errorData.error) {
+          errorMessage = errorData.error;
+        } else if (errorData.mensaje) {
+          errorMessage = errorData.mensaje;
+        }
+      } catch (parseError) {
+        console.error("Error parsing error response:", parseError);
+        errorMessage = `Error al crear el préstamo (${response.status})`;
+      }
+
+      throw new Error(errorMessage);
     }
 
     return await response.json();
