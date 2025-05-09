@@ -34,7 +34,7 @@ export default function Login() {
         sessionStorage.setItem("token", data.token);
         setIsLogged(true);
         setMostrarLogin(false);
-        setMostrarPerfil(true);
+        // setMostrarPerfil(true);
       })
       .catch((err) => setError(err.message))
       .finally(() => {

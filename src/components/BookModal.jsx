@@ -7,6 +7,7 @@ import "../styles/modal.css";
 
 function BookModal({ book, onClose }) {
   const { isBilbiotecari } = useContext(AuthContext);
+  const {isAdministrador} = useContext(AuthContext);
   const [exemplarsByCentre, setExemplarsByCentre] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -196,7 +197,7 @@ function BookModal({ book, onClose }) {
                         <span className="count">{book.exemplar_counts.exclos_prestec} exemplars</span>
                       </li>
                     )}
-                    {book.exemplar_counts.baixa > 0 && (
+                    {(book.exemplar_counts.baixa > 0 && (isBilbiotecari === true || isAdministrador === true)) && (
                       <li>
                         <span className="badge item-status baixa">De baixa</span>
                         <span className="count">{book.exemplar_counts.baixa} exemplars</span>

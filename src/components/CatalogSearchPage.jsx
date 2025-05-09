@@ -70,13 +70,13 @@ function CatalogSearchPage() {
 
   return (
     <div className="container">
-      <h2>Catálogo de la Biblioteca</h2>
+      <h2>Catàleg de la Biblioteca</h2>
 
       <CatalogSearch onSearchResults={handleSearchResults} onSearchStart={() => setIsLoading(true)} />
 
       {hasSearched && (
         <div className="search-results-container">
-          <h3>{`Resultados de la búsqueda (${searchResults.length})`}</h3>
+          <h3>{`Resultats de la cerca (${searchResults.length})`}</h3>
 
           {searchResults.length > 0 ? (
             <div className="results-with-pagination">

@@ -103,7 +103,7 @@ function ImportCSV() {
 
             if (!value) {
                 isValid = false;
-                errors.push(`${header} es obligatori.`);
+                errors.push(`${header} és obligatori.`);
             }
 
             switch (header.toLowerCase()) {
@@ -119,7 +119,7 @@ function ImportCSV() {
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(value)) {
                         isValid = false;
-                        errors.push("Email inválido.");
+                        errors.push("Email invàlid.");
                     }
                     parsedData.email = value;
                     break;
