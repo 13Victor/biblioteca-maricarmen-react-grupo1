@@ -6,7 +6,7 @@ import ModoAdminCSV from "../components/ModoAdminCSV";
 import LoanCreationForm from "../components/LoanCreationForm";
 import LibrarianRoute from "../components/LibrarianRoute";
 import HistorialPrestecs from "../components/HistorialPrestecs";
-import Labels from "../components/Labels";
+import ModoAdminLabels from "../components/ModoAdminLabels";
 
 function AppRoutes() {
     return (
@@ -15,7 +15,7 @@ function AppRoutes() {
             <Route path="/" element={<Navigate to="/cataleg" replace />} />
             <Route path="/csv-importacio" element={<ModoAdminCSV />} />
             <Route path="/cataleg" element={<CatalogSearchPage />} />
-            <Route path="/etiquetes" element={<Labels />} />
+            <Route path="/etiquetes" element={<ModoAdminLabels />} />
 
             <Route
                 path="/crear-prestamo/:exemplarId"

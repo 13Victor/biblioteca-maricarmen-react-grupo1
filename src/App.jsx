@@ -20,7 +20,7 @@ function App() {
           <main className="main-content">
             <AppRoutes />
           </main>
-          {/* <Footer /> */}
+          <Footer />
         </div>
       </AuthProvider>
     </ThemeProvider>
