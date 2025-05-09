@@ -3,12 +3,8 @@ import { AuthContext } from "../context/AuthContext";
 import Pagination from "./Pagination";
 import ExemplarSearch from "./ExemplarSearch";
 import "../styles/Labels.css";
-// PDF
-import jsPDF from "jspdf";
-import JsBarcode from "jsbarcode";
-import { createCanvas } from "canvas";
-// Importar la nueva función
-import { generateLabelsPDF } from "../services/api";
+
+import { generateLabelsPDF, searchExemplars } from "../services/api";
 
 export default function Labels() {
     const { userCentre } = useContext(AuthContext);
@@ -17,21 +13,18 @@ export default function Labels() {
     const [rangeEnd, setRangeEnd] = useState("");
     const [codeQuery, setCodeQuery] = useState("");
     const [isSearching, setIsSearching] = useState(false);
+    const [isPrinting, setIsPrinting] = useState(false); // Nuevo estado para imprimir
     const [searchResults, setSearchResults] = useState([]);
     const [selectedExemplars, setSelectedExemplars] = useState([]);
     const [error, setError] = useState(null);
     const [activeSearch, setActiveSearch] = useState(null); // Tipo de búsqueda activa
+    const searchInputRef = useRef(null);
+    const [selectedSuggestion, setSelectedSuggestion] = useState(null);
 
     // Estado para paginación
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const itemsPerPage = 10;
-
-    // Etiquetas
-    const LABEL_COLUMNS = 4;
-    const LABEL_ROWS = 17;
-    const LABEL_WIDTH_CM = 10;
-    const LABEL_HEIGHT_CM = 5;
 
     // Manejar cambios en el campo de búsqueda
     const handleTextQueryChange = (query) => {
@@ -57,6 +50,12 @@ export default function Labels() {
         setRangeStart("");
         setRangeEnd("");
         setCodeQuery("");
+        setSelectedSuggestion(null); // Limpiar también la sugerencia seleccionada
+
+        // Resetear el componente ExemplarSearch
+        if (searchInputRef.current) {
+            searchInputRef.current.reset();
+        }
     };
 
     // Reemplazar la función handlePrintLabels con esta implementación:
@@ -67,7 +66,7 @@ export default function Labels() {
         }
 
         try {
-            setIsSearching(true); // Reutilizamos este estado para mostrar carga
+            setIsPrinting(true); // Usar el nuevo estado en lugar de isSearching
 
             // Obtener lista de IDs de ejemplares seleccionados
             const exemplarIds = selectedExemplars.map((exemplar) => exemplar.id);
@@ -85,7 +84,7 @@ export default function Labels() {
             console.error("Error al generar las etiquetas:", error);
             setError(`Error al generar las etiquetas: ${error.message}`);
         } finally {
-            setIsSearching(false);
+            setIsPrinting(false); // Restablecer el nuevo estado
         }
     };
 
@@ -96,35 +95,79 @@ export default function Labels() {
         setError(null);
 
         try {
-            let endpoint = "/api/exemplars/search/";
-            let params = {};
+            let searchQuery = {};
+            let hasCriteria = false;
 
-            // Titulo, Autor, Editorial
+            // Añadir criterios de texto si existen
             if (textQuery.trim()) {
-                params = { q: textQuery };
-                // Rango de código
-            } else if (rangeStart.trim() && rangeEnd.trim()) {
-                params = { start: rangeStart, end: rangeEnd };
-                // Código específico
-            } else if (codeQuery.trim()) {
-                params = { exact: codeQuery }; // Buscar por código específico exacto
-            } else {
+                hasCriteria = true;
+                if (selectedSuggestion) {
+                    // Si hay una sugerencia seleccionada, añadir información exacta
+                    searchQuery.exact = true;
+                    searchQuery.id = selectedSuggestion.id;
+                    searchQuery.tipo = selectedSuggestion.tipo;
+                    searchQuery.query = textQuery;
+                } else {
+                    // Búsqueda normal por texto
+                    searchQuery.textQuery = textQuery;
+                }
+                setActiveSearch("combined"); // Indicar que es una búsqueda combinada
+            }
+
+            // Añadir criterios de rango si existen
+            if (rangeStart.trim() && rangeEnd.trim()) {
+                hasCriteria = true;
+                // Añadir parámetros de búsqueda por rango
+                searchQuery.rangeSearch = true;
+                searchQuery.rangeStart = rangeStart.trim().padStart(6, "0");
+                searchQuery.rangeEnd = rangeEnd.trim().padStart(6, "0");
+
+                setActiveSearch(textQuery.trim() ? "combined" : "range");
+            }
+
+            // Añadir criterio de código específico si existe
+            if (codeQuery.trim()) {
+                hasCriteria = true;
+                searchQuery.codeQuery = codeQuery;
+                setActiveSearch(textQuery.trim() || (rangeStart.trim() && rangeEnd.trim()) ? "combined" : "code");
+            }
+
+            if (!hasCriteria) {
                 setError("Si us plau, introdueix almenys un criteri de cerca");
                 setIsSearching(false);
                 return;
             }
 
-            const response = await fetch(`${endpoint}?${new URLSearchParams(params)}`);
-            if (!response.ok) {
-                throw new Error(`Error en la consulta al servidor: ${response.status}`);
-            }
+            // Obtener el ID del centro del usuario actual
+            const centreId = userCentre?.id;
 
-            const data = await response.json();
-            setSearchResults(data);
-            setTotalPages(Math.ceil(data.length / itemsPerPage));
+            // Realizar la búsqueda filtrando por centro
+            let results = await searchExemplars(searchQuery, centreId);
+
+            // Ordenar los resultados por código de registro
+            results = results.sort((a, b) => {
+                // Extraer la parte numérica después del último guion
+                const getNumericPart = (reg) => {
+                    const parts = reg.split("-");
+                    if (parts.length > 2) {
+                        // Convertir la parte de año y secuencia a un número
+                        const year = parseInt(parts[1]) || 0;
+                        const seq = parseInt(parts[2]) || 0;
+                        return year * 1000000 + seq; // Combinar para mantener orden correcto
+                    }
+                    return 0;
+                };
+
+                const numA = getNumericPart(a.registre);
+                const numB = getNumericPart(b.registre);
+
+                return numA - numB; // Orden ascendente
+            });
+
+            setSearchResults(results);
             setCurrentPage(1);
+            setTotalPages(Math.ceil(results.length / itemsPerPage));
         } catch (error) {
-            console.error("Error al buscar ejemplares:", error);
             setError(`Error al realizar la búsqueda: ${error.message}`);
         } finally {
             setIsSearching(false);
@@ -183,10 +226,15 @@ export default function Labels() {
                             {/* Primera fila: búsqueda por texto y rango */}
                             <div className="form-row-grid">
                                 <div className="form-group">
-                                    <label htmlFor="text-search">Títol, autor o editorial:</label>
+                                    <label htmlFor="text-search">Obra, autor o editorial:</label>
                                     <ExemplarSearch
-                                        onSearchResults={() => {}} // No actualizar resultados
-                                        onQueryChange={(query) => setTextQuery(query)} // Actualizar textQuery
+                                        ref={searchInputRef}
+                                        value={textQuery}
+                                        onSearchResults={() => {}}
+                                        onQueryChange={(query, suggestion) => {
+                                            setTextQuery(query);
+                                            setSelectedSuggestion(suggestion || null);
+                                        }}
                                     />
                                 </div>
 
@@ -197,7 +245,7 @@ export default function Labels() {
                                             type="text"
                                             id="range-start"
                                             value={rangeStart}
-                                            onChange={(e) => setRangeStart(e.target.value)}
+                                            onChange={(e) => setRangeStart(e.target.value.replace(/\D/g, ""))}
                                             placeholder="Codi inicial"
                                             maxLength={6}
                                         />
@@ -206,7 +254,7 @@ export default function Labels() {
                                             type="text"
                                             id="range-end"
                                             value={rangeEnd}
-                                            onChange={(e) => setRangeEnd(e.target.value)}
+                                            onChange={(e) => setRangeEnd(e.target.value.replace(/\D/g, ""))}
                                             placeholder="Codi final"
                                             maxLength={6}
                                         />
@@ -258,7 +306,7 @@ export default function Labels() {
                             <thead>
                                 <tr>
                                     <th>Registre</th>
-                                    <th>Títol</th>
+                                    <th>Obra</th>
                                     <th>Autor</th>
                                     <th>Editorial</th>
                                     <th>Tipus</th>
@@ -278,7 +326,7 @@ export default function Labels() {
                                             <td>
                                                 <span className="badge item-type-badge">{exemplar.tipus}</span>
                                             </td>
-                                            <td>
+                                            <td className="text-center">
                                                 <input
                                                     type="checkbox"
                                                     checked={isSelected}
@@ -339,12 +387,12 @@ export default function Labels() {
                         </div>
 
                         <div className="action-buttons">
-                            <button onClick={handlePrintLabels} className="print-button">
-                                Imprimir etiquetes
-                            </button>{" "}
                             <button onClick={clearSelections} className="clear-button">
                                 Esborrar selecció
                             </button>
+                            <button onClick={handlePrintLabels} className="print-button">
+                                {isPrinting ? "Imprimint..." : "Imprimir etiquetes"}
+                            </button>{" "}
                         </div>
                     </>
                 ) : (

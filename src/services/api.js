@@ -229,25 +229,56 @@ export const searchExemplarSuggestions = async (query) => {
 };
 
 // Función para realizar búsqueda completa de ejemplares
-export const searchExemplars = async (query) => {
+export const searchExemplars = async (query, centreId = null) => {
     try {
-        const url =
-            query.trim() === ""
-                ? `${API_BASE_URL}/exemplars/search/`
-                : `${API_BASE_URL}/exemplars/search/?q=${encodeURIComponent(query)}`;
+        let url = `${API_BASE_URL}/exemplars/search/?`;
+        const params = new URLSearchParams();
+
+        if (typeof query === "object") {
+            // Manejar búsqueda exacta por sugerencia seleccionada
+            if (query.exact) {
+                params.append("exact", "true");
+                params.append("id", query.id);
+                params.append("tipo", query.tipo);
+                params.append("q", query.query);
+            }
+
+            // Añadir búsqueda por texto si existe
+            if (query.textQuery) {
+                params.append("q", query.textQuery);
+            }
+
+            // Añadir búsqueda por rango si existe
+            if (query.rangeSearch) {
+                params.append("rangeSearch", "true");
+                params.append("start", query.rangeStart);
+                params.append("end", query.rangeEnd);
+            }
+
+            // Añadir búsqueda por código específico
+            if (query.codeQuery) {
+                params.append("code", query.codeQuery);
+            }
+        } else if (typeof query === "string") {
+            params.append("q", query);
+        }
+
+        // Añadir filtro de centro si está disponible
+        if (centreId) {
+            params.append("centre_id", centreId);
+        }
+
+        url += params.toString();
 
         const response = await fetch(url);
-
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Error en la respuesta del servidor:", errorText);
-            throw new Error(`Error al realizar la búsqueda de ejemplares (${response.status})`);
+            throw new Error(`Error en la búsqueda: ${response.status}`);
         }
 
         return await response.json();
     } catch (error) {
         console.error("Error en searchExemplars:", error);
-        throw error;
+        return [];
     }
 };
 

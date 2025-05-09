@@ -1,15 +1,31 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { searchExemplarSuggestions, searchExemplars } from "../services/api";
 import useDebounce from "../hooks/useDebounce";
 
-function ExemplarSearch({ onSearchResults, onQueryChange }) {
+const ExemplarSearch = forwardRef(({ onSearchResults, onQueryChange, value }, ref) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [selectedSuggestion, setSelectedSuggestion] = useState(null); // Nuevo estado para guardar la sugerencia seleccionada
     const suggestionsRef = useRef(null);
+    const [query, setQuery] = useState(value || "");
 
     const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+    useImperativeHandle(ref, () => ({
+        reset: () => {
+            setQuery("");
+            setSearchQuery("");
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setSelectedSuggestion(null); // Resetear la sugerencia seleccionada
+        },
+    }));
+
+    useEffect(() => {
+        setQuery(value || "");
+    }, [value]);
 
     useEffect(() => {
         const fetchSuggestions = async () => {
@@ -54,8 +70,9 @@ function ExemplarSearch({ onSearchResults, onQueryChange }) {
     const handleSearchChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
+        setSelectedSuggestion(null); // Limpiar la sugerencia si el usuario edita manualmente
         if (onQueryChange) {
-            onQueryChange(query); // Notificar el cambio al componente padre
+            onQueryChange(query);
         }
         if (query.length > 2) {
             setShowSuggestions(true);
@@ -66,8 +83,13 @@ function ExemplarSearch({ onSearchResults, onQueryChange }) {
 
     const handleSuggestionClick = (suggestion) => {
         setSearchQuery(suggestion.resultado);
+        setSelectedSuggestion(suggestion); // Guardar la sugerencia completa
         setShowSuggestions(false);
-        // No llamar a handleSearch para evitar mostrar resultados en la tabla
+
+        // Transmitir la información de la sugerencia al componente padre
+        if (onQueryChange) {
+            onQueryChange(suggestion.resultado, suggestion);
+        }
     };
 
     const handleSearch = async (query = searchQuery) => {
@@ -81,7 +103,19 @@ function ExemplarSearch({ onSearchResults, onQueryChange }) {
         setIsLoading(true);
 
         try {
-            const results = await searchExemplars(trimmedQuery);
+            let results;
+            if (selectedSuggestion) {
+                // Si hay una sugerencia seleccionada, buscar por su ID o tipo específico
+                results = await searchExemplars({
+                    exact: true,
+                    id: selectedSuggestion.id,
+                    tipo: selectedSuggestion.tipo,
+                    query: trimmedQuery,
+                });
+            } else {
+                // Búsqueda normal por texto
+                results = await searchExemplars(trimmedQuery);
+            }
             onSearchResults(results, true);
         } catch (error) {
             console.error("Error en la búsqueda de ejemplares:", error);
@@ -128,6 +162,6 @@ function ExemplarSearch({ onSearchResults, onQueryChange }) {
             </form>
         </div>
     );
-}
+});
 
 export default ExemplarSearch;
