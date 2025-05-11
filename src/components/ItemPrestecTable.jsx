@@ -11,7 +11,7 @@ function ItemPrestecTable({ bookId }) {
   const [error, setError] = useState(null);
 
   // Properly access the isBibliotecari from context
-  const { isBilbiotecari } = useContext(AuthContext);
+  const { isBilbiotecari, userCentre } = useContext(AuthContext);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,8 +92,23 @@ function ItemPrestecTable({ bookId }) {
   // Add a console log to check the value of isBilbiotecari
   console.log("ItemPrestecTable - isBilbiotecari:", isBilbiotecari);
 
+  // Add a function to check if the exemplar can be loaned by this user
+  const canLoanExemplar = (exemplar) => {
+    // Must be available (not excluded from loans and not retired)
+    const isAvailable = !exemplar.baixa && !exemplar.exclos_prestec;
+
+    // Must be from the same center as the librarian
+    const isFromSameCentre = userCentre && exemplar.centre && userCentre.id === exemplar.centre.id;
+
+    console.log(`Exemplar ${exemplar.id} check - Available: ${isAvailable}, Same Centre: ${isFromSameCentre}`);
+    console.log(`User Centre:`, userCentre);
+    console.log(`Exemplar Centre:`, exemplar.centre);
+
+    return isAvailable && isFromSameCentre;
+  };
+
   return (
-    <div id="historial-prestecs-container">
+    <div id="exemplars-disponibles-container">
       <h3>Exemplars disponibles ({exemplars.length})</h3>
       <table>
         <thead>
@@ -114,17 +129,14 @@ function ItemPrestecTable({ bookId }) {
               </td>
               {isBilbiotecari && (
                 <td>
-                  {!exemplar.baixa && !exemplar.exclos_prestec && (
-                    <Link
-                      to={`/crear-prestamo/${exemplar.id}`}
-                      className="button_prestec"
-                      onClick={(e) => {
-                        // Add a click event to debug
-                        console.log(`Navigating to /crear-prestamo/${exemplar.id}`);
-                      }}
-                    >
+                  {canLoanExemplar(exemplar) ? (
+                    <Link to={`/crear-prestamo/${exemplar.id}`} className="button_prestec">
                       Fer préstec
                     </Link>
+                  ) : (
+                    <span className="disabled-action">
+                      {!exemplar.baixa && !exemplar.exclos_prestec ? "Altre centre" : "No disponible"}
+                    </span>
                   )}
                 </td>
               )}
