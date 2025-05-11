@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
         return cookie.substring(name.length, cookie.length);
       }
     }
+
     return "";
   };
 
@@ -71,95 +72,91 @@ export const AuthProvider = ({ children }) => {
         const storedToken = sessionStorage.getItem("token");
 
         if (storedUserData && storedToken) {
-          const userData = JSON.parse(storedUserData);
-          setUsuari(userData);
-          setIsLogged(true);
-          setIsAdministrador(userData.is_superuser);
-          setIsBilbiotecari(userData.is_staff);
-
-          // A pesar de tener datos en sessionStorage, verificamos con el backend
-          // para mantener la consistencia y obtener datos actualizados
           try {
-            const response = await fetch("http://localhost:8000/api/usuari/", {
-              headers: {
-                Authorization: `Bearer ${storedToken}`,
-              },
+            const userData = JSON.parse(storedUserData);
+            console.log("Loading stored user data:", userData);
+
+            // Never set isLogged without setting user data
+            setUsuari(userData);
+            setIsLogged(true);
+            setIsAdministrador(userData.is_superuser || false);
+            setIsBilbiotecari(userData.is_staff || false);
+
+            // Make sure we have complete data
+            if (storedToken !== "session-auth" && (!userData.first_name || !userData.last_name)) {
+              console.log("Fetching complete user data...");
+              const response = await fetch("http://localhost:8000/api/usuari/", {
+                headers: {
+                  Authorization: `Bearer ${storedToken}`,
+                },
+              });
+
+              if (response.ok) {
+                const completeUserData = await response.json();
+                console.log("Received complete user data:", completeUserData);
+                setUsuari(completeUserData);
+                setIsAdministrador(completeUserData.is_superuser || false);
+                setIsBilbiotecari(completeUserData.is_staff || false);
+                sessionStorage.setItem("userData", JSON.stringify(completeUserData));
+              }
+            }
+          } catch (error) {
+            console.error("Error processing stored user data:", error);
+            // Clear invalid data
+            sessionStorage.removeItem("userData");
+            sessionStorage.removeItem("token");
+            setUsuari(null);
+            setIsLogged(false);
+          }
+        } else {
+          // No data in sessionStorage, try with session endpoint
+          try {
+            const response = await fetch("http://localhost:8000/api/auth/session/", {
+              credentials: "include",
             });
 
             if (response.ok) {
-              const freshUserData = await response.json();
-              // Si hay diferencias, actualizamos
-              if (JSON.stringify(freshUserData) !== JSON.stringify(userData)) {
-                setUsuari(freshUserData);
-                sessionStorage.setItem("userData", JSON.stringify(freshUserData));
-                setIsAdministrador(freshUserData.is_superuser);
-                setIsBilbiotecari(freshUserData.is_staff);
+              const data = await response.json();
+              console.log("Session check response:", data);
+
+              if (data.isAuthenticated && data.user) {
+                // Always set user data together with isLogged
+                setUsuari(data.user);
+                setIsLogged(true);
+                setIsAdministrador(data.user.is_superuser || false);
+                setIsBilbiotecari(data.user.is_staff || false);
+                sessionStorage.setItem("userData", JSON.stringify(data.user));
+                sessionStorage.setItem("token", "session-auth");
+              } else {
+                // Clear all state if not authenticated
+                setUsuari(null);
+                setIsLogged(false);
+                setIsAdministrador(false);
+                setIsBilbiotecari(false);
               }
+            } else {
+              // Session check failed, ensure logged out state
+              setUsuari(null);
+              setIsLogged(false);
             }
-          } catch (err) {
-            // Si falla la verificación, seguimos usando los datos del sessionStorage
-            console.log("Usando datos de sesión locales, error al verificar:", err);
-          }
-        } else {
-          // Si no hay datos en sessionStorage, intentamos con la API de sesión
-          const response = await fetch("http://localhost:8000/api/auth/session/", {
-            credentials: "include",
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-
-            if (data.isAuthenticated && data.user) {
-              setUsuari(data.user);
-              setIsLogged(true);
-              setIsAdministrador(data.user.is_superuser);
-              setIsBilbiotecari(data.user.is_staff);
-
-              // Guardar en sessionStorage para compatibilidad
-              sessionStorage.setItem("userData", JSON.stringify(data.user));
-              sessionStorage.setItem("token", "session-auth"); // Un valor simbólico
-            }
+          } catch (error) {
+            console.error("Error checking session:", error);
+            setUsuari(null);
+            setIsLogged(false);
           }
         }
       } catch (error) {
-        console.error("Error al verificar autenticación:", error);
+        console.error("Authentication check error:", error);
         setErrorProfile("Error al verificar la sesión");
+        // Ensure user is logged out on error
+        setUsuari(null);
+        setIsLogged(false);
       } finally {
         setLoading(false);
       }
     };
 
-    // Verificar autenticación al cargar
     checkAuthentication();
-
-    // Verificar si hay query params de autenticación
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("logged_in") === "true") {
-      // Acabamos de iniciar sesión correctamente
-      setMostrarPerfil(true);
-      // Limpiar la URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-
-      // Si hay un token en los parámetros, guardarlo
-      const token = urlParams.get("token");
-      if (token) {
-        sessionStorage.setItem("token", token);
-        // Intentar obtener datos del usuario con este token
-        fetch("http://localhost:8000/api/usuari/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then((response) => response.json())
-          .then((userData) => {
-            setUsuari(userData);
-            sessionStorage.setItem("userData", JSON.stringify(userData));
-            setIsAdministrador(userData.is_superuser);
-            setIsBilbiotecari(userData.is_staff);
-          })
-          .catch((err) => console.error("Error al obtener datos con el token:", err));
-      }
-    }
   }, []);
 
   return (

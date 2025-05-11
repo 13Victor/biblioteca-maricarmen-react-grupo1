@@ -3,8 +3,10 @@ import { AuthContext } from "../context/AuthContext";
 import "../styles/PerfilUsuari.css";
 
 export default function PerfilUsuari() {
-  const { usuari, errorProfile, handleLogOut } = useContext(AuthContext);
+  const { usuari, setUsuari, errorProfile, handleLogOut } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(!usuari);
+  const [loadError, setLoadError] = useState(null);
   const [editedData, setEditedData] = useState({
     email: usuari?.email || "",
     first_name: usuari?.first_name || "",
@@ -13,12 +15,49 @@ export default function PerfilUsuari() {
   });
 
   useEffect(() => {
+    if (!usuari && sessionStorage.getItem("token")) {
+      setIsLoading(true);
+      setLoadError(null);
+
+      fetch("http://localhost:8000/api/usuari/", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((userData) => {
+          console.log("Loaded user data:", userData);
+          setUsuari(userData);
+          sessionStorage.setItem("userData", JSON.stringify(userData));
+          setEditedData({
+            email: userData.email || "",
+            first_name: userData.first_name || "",
+            last_name: userData.last_name || "",
+            telefon: userData.telefon || "",
+          });
+        })
+        .catch((error) => {
+          console.error("Error loading user data:", error);
+          setLoadError("No s'ha pogut carregar les dades del perfil.");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [usuari, setUsuari]);
+
+  useEffect(() => {
     if (usuari) {
       setEditedData({
-        email: usuari.email,
-        first_name: usuari.first_name,
-        last_name: usuari.last_name,
-        telefon: usuari.telefon,
+        email: usuari.email || "",
+        first_name: usuari.first_name || "",
+        last_name: usuari.last_name || "",
+        telefon: usuari.telefon || "",
       });
     }
   }, [usuari]);
@@ -31,17 +70,17 @@ export default function PerfilUsuari() {
         try {
           const response = await fetch("http://localhost:8000/api/usuari/", {
             headers: {
-              "Authorization": `Bearer ${sessionStorage.getItem("token")}`,
+              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
             },
           });
-          
+
           if (response.ok) {
             const updatedUserData = await response.json();
             // Actualizar datos locales
             Object.assign(usuari, updatedUserData);
             // Actualizar también en sessionStorage
             sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
-            
+
             // Actualizar el formulario de edición
             setEditedData({
               email: updatedUserData.email || "",
@@ -54,7 +93,7 @@ export default function PerfilUsuari() {
         }
       }
     };
-    
+
     checkUserData();
   }, [usuari]);
 
@@ -113,12 +152,15 @@ export default function PerfilUsuari() {
     }
   };
 
-  if (errorProfile) return <div>{errorProfile}</div>;
-  if (!usuari) return <></>;
+  if (errorProfile) return <div className="error-message">{errorProfile}</div>;
+  if (loadError) return <div className="error-message">{loadError}</div>;
+  if (isLoading) return <div className="loading">Carregant dades del perfil...</div>;
+  if (!usuari) return <div className="error-message">No s'han trobat dades d'usuari</div>;
 
   return (
     <div id="perfilUsuari-container">
       <h2>{usuari.username}</h2>
+
       <div id="perfilUsuari-info">
         <div>
           <strong>Nom: </strong>

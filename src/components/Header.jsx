@@ -24,6 +24,15 @@ export default function Header() {
     setMostrarLogin((prev) => !prev);
   };
 
+  // Add this inside your Header component
+  console.log("Header render state:", {
+    isLogged,
+    isBilbiotecari,
+    isAdministrador,
+    usuari,
+    mostrarPerfil,
+  });
+
   return (
     <>
       <div id="header-container">
@@ -39,9 +48,11 @@ export default function Header() {
                 ? "Perfil Administrador"
                 : isBilbiotecari
                 ? "Perfil Bibliotecari"
-                : usuari
-                ? "Perfil Usuari"
-                : "Perfil Undefined"}
+                : usuari && usuari.username
+                ? `Perfil ${usuari.username}`
+                : isLogged
+                ? "Carregant perfil..." // Show loading state when logged in but no user data
+                : "Perfil"}
             </button>
           )}
         </div>

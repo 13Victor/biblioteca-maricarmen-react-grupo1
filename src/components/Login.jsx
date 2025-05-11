@@ -6,7 +6,16 @@ import { GoogleIcon, MicrosoftIcon } from "./Icons";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { setIsLogged, setMostrarLogin, setMostrarPerfil } = useContext(AuthContext);
+  // Add setUsuari to the destructured context values
+  const {
+    setIsLogged,
+    setMostrarLogin,
+    setMostrarPerfil,
+    setUsuari, // Add this line
+    setIsAdministrador,
+    setIsBilbiotecari,
+  } = useContext(AuthContext);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -17,80 +26,84 @@ export default function Login() {
 
   const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
 
-  // Comprobar si hay un error en los parámetros de URL
-  useEffect(() => {
-    const errorParam = searchParams.get("error");
-    if (errorParam) {
-      if (errorParam === "auth_failed") {
-        setError("La autenticación ha fallado. Por favor, inténtalo de nuevo.");
-      } else if (errorParam === "invalid_state") {
-        setError("Error de seguridad. Por favor, inténtalo de nuevo.");
-      } else if (errorParam === "token_error") {
-        setError("Error al obtener el token. Por favor, inténtalo de nuevo.");
-      } else if (errorParam === "no_email") {
-        setError("No se pudo obtener tu correo electrónico. Asegúrate de permitir el acceso a tu email.");
-      } else if (errorParam === "server_error") {
-        setError("Error en el servidor. Por favor, inténtalo más tarde.");
-      }
-    }
-  }, [searchParams]);
-
-  // Comprobar si hay un token en la URL (callback de autenticación social)
-  useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) {
-      // Hacer una solicitud al backend para verificar el token
-      fetch(`http://localhost:8000/api/token/?social_token=${token}`)
-        .then((response) => {
-          if (!response.ok) throw new Error("Token inválido");
-          return response.json();
-        })
-        .then((data) => {
-          if (data.token) {
-            sessionStorage.setItem("token", data.token);
-            sessionStorage.setItem("userData", JSON.stringify(data.user));
-            setIsLogged(true);
-            setMostrarLogin(false);
-            setMostrarPerfil(true);
-            navigate("/"); // Redirigir a la página principal
-          }
-        })
-        .catch((err) => {
-          setError("Error de autenticación: " + err.message);
-        });
-    }
-  }, [searchParams, setIsLogged, setMostrarLogin, setMostrarPerfil, navigate]);
-
-  // Login tradicional con usuario y contraseña
+  // Fix the useEffect for traditional login
   useEffect(() => {
     if (!doFetch) return;
 
-    setIsLoading(true);
-    setError(null);
-    // Usar la URL completa de la API
-    fetch(`${API_BASE_URL}/api/token/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${btoa(username + ":" + password)}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Usuari o contrassenya incorrectes");
-        return response.json();
-      })
-      .then((data) => {
-        sessionStorage.setItem("token", data.token);
-        setIsLogged(true);
-        setMostrarLogin(false);
-        setMostrarPerfil(true);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => {
+    const fetchToken = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Create Basic Auth header
+        const credentials = btoa(`${username}:${password}`);
+
+        const response = await fetch(`${API_BASE_URL}/api/token/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Basic ${credentials}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Error de autenticación");
+        }
+
+        const data = await response.json();
+
+        if (data.token) {
+          // Get user data with the token
+          const userResponse = await fetch(`${API_BASE_URL}/api/usuari/`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          });
+
+          if (!userResponse.ok) {
+            throw new Error("Error al obtener datos del usuario");
+          }
+
+          const userData = await userResponse.json();
+
+          // Store authentication data
+          sessionStorage.setItem("token", data.token);
+          sessionStorage.setItem("userData", JSON.stringify(userData));
+
+          // Update context
+          setUsuari(userData);
+          setIsLogged(true);
+          setIsAdministrador(userData.is_superuser || false);
+          setIsBilbiotecari(userData.is_staff || false);
+          setMostrarLogin(false);
+
+          // Redirect to home or profile
+          navigate("/cataleg");
+        } else {
+          throw new Error("No se recibió un token válido");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        setError(error.message);
+      } finally {
         setIsLoading(false);
         setDoFetch(false);
-      });
-  }, [doFetch, setIsLogged, setMostrarLogin, setMostrarPerfil]);
+      }
+    };
+
+    fetchToken();
+  }, [
+    doFetch,
+    username,
+    password,
+    API_BASE_URL,
+    setIsLogged,
+    setMostrarLogin,
+    setUsuari,
+    setIsAdministrador,
+    setIsBilbiotecari,
+    navigate,
+  ]);
 
   return (
     <div id="login-container">
