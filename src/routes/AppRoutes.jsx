@@ -6,26 +6,28 @@ import ModoAdminCSV from "../components/ModoAdminCSV";
 import LoanCreationForm from "../components/LoanCreationForm";
 import LibrarianRoute from "../components/LibrarianRoute";
 import HistorialPrestecs from "../components/HistorialPrestecs";
+import ModoAdminLabels from "../components/ModoAdminLabels";
 
 function AppRoutes() {
-  return (
-    // Only use Routes and Route here, NOT another Router
-    <Routes>
-      <Route path="/" element={<Navigate to="/cataleg" replace />} />
-      <Route path="/csv-importacio" element={<ModoAdminCSV />} />
-      <Route path="/cataleg" element={<CatalogSearchPage />} />
+    return (
+        // Only use Routes and Route here, NOT another Router
+        <Routes>
+            <Route path="/" element={<Navigate to="/cataleg" replace />} />
+            <Route path="/csv-importacio" element={<ModoAdminCSV />} />
+            <Route path="/cataleg" element={<CatalogSearchPage />} />
+            <Route path="/etiquetes" element={<ModoAdminLabels />} />
 
-      <Route
-        path="/crear-prestamo/:exemplarId"
-        element={
-          <LibrarianRoute>
-            <LoanCreationForm />
-          </LibrarianRoute>
-        }
-      />
-      <Route path="/historial-prestecs" element={<HistorialPrestecs />} />
-    </Routes>
-  );
+            <Route
+                path="/crear-prestamo/:exemplarId"
+                element={
+                    <LibrarianRoute>
+                        <LoanCreationForm />
+                    </LibrarianRoute>
+                }
+            />
+            <Route path="/historial-prestecs" element={<HistorialPrestecs />} />
+        </Routes>
+    );
 }
 
 export default AppRoutes;

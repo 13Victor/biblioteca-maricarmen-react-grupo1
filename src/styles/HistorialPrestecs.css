@@ -50,6 +50,11 @@
   display: flex;
 }
 
+#historial-prestecs-container table tr td span {
+  color: var(--grey-dark);
+  font-size: var(--font-size-sm);
+}
+
 .estat-pill {
   padding: 4px 12px;
   border-radius: 16px;

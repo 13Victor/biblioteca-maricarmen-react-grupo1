@@ -24,6 +24,7 @@ function Aside() {
         {isLogged && (usuari?.is_admin || usuari?.is_staff) && (
           <>
             <button onClick={() => navigate("/csv-importacio")}>Importar Usuaris</button>
+            <button onClick={() => navigate("/etiquetes")}>Impresió Etiquetes</button>
             <button onClick={() => (window.location.href = "/admin")}>Panell d'Administració</button>
           </>
         )}

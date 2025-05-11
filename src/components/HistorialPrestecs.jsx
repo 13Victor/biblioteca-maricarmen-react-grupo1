@@ -2,6 +2,25 @@ import "../styles/HistorialPrestecs.css";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
+// función para hacer el timeago
+
+const getTimeAgo = (date) => {
+  const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const years = Math.floor(days / 365);
+
+  if (seconds < 60) return "Fa uns segons";
+  if (minutes < 60) return `Fa ${minutes} ${minutes === 1 ? "minut" : "minuts"}`;
+  if (hours < 24) return `Fa ${hours} ${hours === 1 ? "hora" : "hores"}`;
+  if (days === 1) return "Ahir";
+  if (days < 7) return `Fa ${days} dies`;
+  if (weeks < 52) return `Fa ${weeks} ${weeks === 1 ? "setmana" : "setmanes"}`;
+  return `Fa ${years} ${years === 1 ? "any" : "anys"}`;
+};
+
 export default function HistorialPrestecs() {
   const { usuari } = useContext(AuthContext);
   const [historial, setHistorial] = useState([]);
@@ -87,8 +106,20 @@ export default function HistorialPrestecs() {
             <tr key={prestec.prestec_id}>
               <td>{prestec.exemplar.cataleg.titol}</td>
               <td>{prestec.exemplar.cataleg.tipus}</td>
-              <td>{new Date(prestec.data_prestec).toLocaleDateString()}</td>
-              <td>{prestec.data_devolucio ? new Date(prestec.data_devolucio).toLocaleDateString() : "-"}</td>
+              <td>
+                {new Date(prestec.data_prestec).toLocaleDateString()}{" "}
+                <span>&nbsp; ({getTimeAgo(prestec.data_prestec)})</span>
+              </td>
+              <td>
+                {prestec.data_devolucio ? (
+                  <>
+                    {new Date(prestec.data_devolucio).toLocaleDateString()}{" "}
+                    <span>&nbsp; ({getTimeAgo(prestec.data_devolucio)})</span>
+                  </>
+                ) : (
+                  "-"
+                )}
+              </td>
               <td>
                 <span className={`estat-pill ${prestec.data_devolucio ? "retornat" : "pendent"}`}>
                   {prestec.data_devolucio ? "Retornat" : "Pendent"}
