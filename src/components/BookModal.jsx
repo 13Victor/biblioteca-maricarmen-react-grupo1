@@ -6,10 +6,12 @@ import { getExemplarsByItem } from "../services/api";
 import "../styles/modal.css";
 
 function BookModal({ book, onClose }) {
-  const { isBilbiotecari } = useContext(AuthContext);
-  const {isAdministrador} = useContext(AuthContext);
+  const { usuari } = useContext(AuthContext);
   const [exemplarsByCentre, setExemplarsByCentre] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const isStaff = usuari?.is_staff === true;
+  const isSuperuser = usuari?.is_superuser === true;
 
   useEffect(() => {
     // Cargar los ejemplares por centro si tenemos un libro
@@ -69,7 +71,9 @@ function BookModal({ book, onClose }) {
   // Safe access to nested properties with null instead of default value
   const getNestedValue = (obj, path) => {
     if (!obj) return null;
-    const value = path.split(".").reduce((a, key) => (o && o[key] !== undefined ? o[key] : undefined), obj);
+    const value = path.split(".").reduce((acc, key) => {
+      return acc && acc[key] !== undefined ? acc[key] : undefined;
+    }, obj);
     return value !== undefined && value !== null ? value : null;
   };
 
@@ -197,7 +201,7 @@ function BookModal({ book, onClose }) {
                         <span className="count">{book.exemplar_counts.exclos_prestec} exemplars</span>
                       </li>
                     )}
-                    {(book.exemplar_counts.baixa > 0 && (isBilbiotecari === true || isAdministrador === true)) && (
+                    {book.exemplar_counts.baixa > 0 && (isStaff || isSuperuser) && (
                       <li>
                         <span className="badge item-status baixa">De baixa</span>
                         <span className="count">{book.exemplar_counts.baixa} exemplars</span>
@@ -260,7 +264,7 @@ function BookModal({ book, onClose }) {
               </div>
             )}
 
-            {isBilbiotecari && (
+            {isStaff && (
               <div className="info-section exemplars-center">
                 <ItemPrestecTable bookId={book.id} />
               </div>

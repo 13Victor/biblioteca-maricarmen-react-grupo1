@@ -10,14 +10,30 @@ function ItemPrestecTable({ bookId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Properly access the isBibliotecari from context
-  const { isBilbiotecari, userCentre } = useContext(AuthContext);
+  // Get the usuari object directly
+  const { usuari } = useContext(AuthContext);
+
+  // Derive roles directly from user properties
+  const isStaff = usuari?.is_staff === true;
+  const isSuperuser = usuari?.is_superuser === true;
+  const userCentre = usuari?.centre;
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Show 10 exemplars per page
   const [totalPages, setTotalPages] = useState(0);
-
+  console.log("ItemPrestecTable - User Role Check:", {
+    usuari: usuari
+      ? {
+          username: usuari.username,
+          is_staff: usuari.is_staff,
+          is_superuser: usuari.is_superuser,
+          centre: usuari.centre,
+        }
+      : null,
+    isStaff,
+    isSuperuser,
+  });
   useEffect(() => {
     const fetchExemplars = async () => {
       try {
@@ -89,22 +105,82 @@ function ItemPrestecTable({ bookId }) {
 
   const currentExemplars = getCurrentItems();
 
-  // Add a console log to check the value of isBilbiotecari
-  console.log("ItemPrestecTable - isBilbiotecari:", isBilbiotecari);
-
   // Add a function to check if the exemplar can be loaned by this user
+
   const canLoanExemplar = (exemplar) => {
     // Must be available (not excluded from loans and not retired)
     const isAvailable = !exemplar.baixa && !exemplar.exclos_prestec;
 
-    // Must be from the same center as the librarian
-    const isFromSameCentre = userCentre && exemplar.centre && userCentre.id === exemplar.centre.id;
+    // Extract center information
+    const userCentreInfo = getCentreInfo(usuari?.centre);
+    const exemplarCentreInfo = getCentreInfo(exemplar.centre);
 
-    console.log(`Exemplar ${exemplar.id} check - Available: ${isAvailable}, Same Centre: ${isFromSameCentre}`);
-    console.log(`User Centre:`, userCentre);
-    console.log(`Exemplar Centre:`, exemplar.centre);
+    // Debug information
+    console.log("User Centre Info:", userCentreInfo);
+    console.log("Exemplar Centre Info:", exemplarCentreInfo);
+
+    // Compare centers - try matching by ID first, then by name
+    let isFromSameCentre = false;
+
+    if (userCentreInfo && exemplarCentreInfo) {
+      // Try to match by ID first
+      if (userCentreInfo.id && exemplarCentreInfo.id) {
+        isFromSameCentre = String(userCentreInfo.id) === String(exemplarCentreInfo.id);
+      }
+
+      // If we can't match by ID or the match is false, try matching by name
+      if (!isFromSameCentre && userCentreInfo.nom && exemplarCentreInfo.nom) {
+        isFromSameCentre = areSimilarCentreNames(userCentreInfo.nom, exemplarCentreInfo.nom);
+      }
+    }
+
+    console.log(`Exemplar ${exemplar.id} check:`, {
+      isAvailable,
+      userCentreInfo,
+      exemplarCentreInfo,
+      isFromSameCentre,
+    });
 
     return isAvailable && isFromSameCentre;
+  };
+
+  const areSimilarCentreNames = (name1, name2) => {
+    if (!name1 || !name2) return false;
+
+    // Normalize both names: lowercase, remove common prefixes, and trim
+    const normalize = (str) => {
+      let result = str.toLowerCase().trim();
+      // Remove common prefixes like "IES", "CEIP", etc.
+      return result.replace(/^(ies|ceip|centre|escola|institut)\s+/i, "");
+    };
+
+    const normalized1 = normalize(name1);
+    const normalized2 = normalize(name2);
+
+    // First try exact match after normalization
+    if (normalized1 === normalized2) return true;
+
+    // Then try containment (one is part of the other)
+    return normalized1.includes(normalized2) || normalized2.includes(normalized1);
+  };
+
+  const getCentreInfo = (centre) => {
+    // If it's just a string (name), return an object with the name
+    if (typeof centre === "string") {
+      return { nom: centre };
+    }
+
+    // If it's already an object with id and/or nom, return it
+    if (centre && typeof centre === "object") {
+      return centre;
+    }
+
+    // If it's a number (just the ID), return an object with the ID
+    if (typeof centre === "number") {
+      return { id: centre };
+    }
+
+    return null;
   };
 
   return (
@@ -116,7 +192,7 @@ function ItemPrestecTable({ bookId }) {
             <th>Registre</th>
             <th>Centre</th>
             <th>Estat</th>
-            {isBilbiotecari && <th>Accions</th>}
+            {isStaff && <th>Accions</th>}
           </tr>
         </thead>
         <tbody>
@@ -127,7 +203,7 @@ function ItemPrestecTable({ bookId }) {
               <td>
                 <span className={getStatusClass(exemplar)}>{getStatusText(exemplar)}</span>
               </td>
-              {isBilbiotecari && (
+              {isStaff && (
                 <td>
                   {canLoanExemplar(exemplar) ? (
                     <Link to={`/crear-prestamo/${exemplar.id}`} className="button_prestec">
