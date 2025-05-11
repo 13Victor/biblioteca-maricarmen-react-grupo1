@@ -69,7 +69,7 @@ function BookModal({ book, onClose }) {
   // Safe access to nested properties with null instead of default value
   const getNestedValue = (obj, path) => {
     if (!obj) return null;
-    const value = path.split(".").reduce((o, key) => (o && o[key] !== undefined ? o[key] : undefined), obj);
+    const value = path.split(".").reduce((a, key) => (o && o[key] !== undefined ? o[key] : undefined), obj);
     return value !== undefined && value !== null ? value : null;
   };
 

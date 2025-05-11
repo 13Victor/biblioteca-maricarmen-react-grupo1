@@ -1,42 +1,39 @@
 import "../styles/HistorialPrestecs.css";
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function HistorialPrestecs() {
-    const { usuari } = useContext(AuthContext);
-    const [historial, setHistorial] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+  const { usuari } = useContext(AuthContext);
+  const [historial, setHistorial] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchHistorial = async () => {
       if (!usuari?.id) return;
-      
-      const token = sessionStorage.getItem('token');
-      console.log('Token present:', !!token); // Verificar si hay token
-      
+
+      const token = sessionStorage.getItem("token");
+      console.log("Token present:", !!token); // Verificar si hay token
+
       try {
         setLoading(true);
-        const response = await fetch(
-          `/api/usuari/historial_prestecs?usuari_id=${usuari.id}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        );
-        
+        const response = await fetch(`/api/usuari/historial_prestecs?usuari_id=${usuari.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         // Log del status de la respuesta
-        console.log('Response status:', response.status);
-        
+        console.log("Response status:", response.status);
+
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('API Error:', errorData); // Log detallado del error
-          throw new Error('Error al obtenir l\'historial');
+          console.error("API Error:", errorData); // Log detallado del error
+          throw new Error("Error al obtenir l'historial");
         }
-        
+
         const data = await response.json();
         setHistorial(data);
       } catch (err) {
@@ -45,7 +42,7 @@ export default function HistorialPrestecs() {
         setLoading(false);
       }
     };
-  
+
     fetchHistorial();
   }, [usuari]);
 
@@ -91,10 +88,10 @@ export default function HistorialPrestecs() {
               <td>{prestec.exemplar.cataleg.titol}</td>
               <td>{prestec.exemplar.cataleg.tipus}</td>
               <td>{new Date(prestec.data_prestec).toLocaleDateString()}</td>
-              <td>{prestec.data_devolucio ? new Date(prestec.data_devolucio).toLocaleDateString() : '-'}</td>
+              <td>{prestec.data_devolucio ? new Date(prestec.data_devolucio).toLocaleDateString() : "-"}</td>
               <td>
-                <span className={`estat-pill ${prestec.data_devolucio ? 'retornat' : 'pendent'}`}>
-                  {prestec.data_devolucio ? 'Retornat' : 'Pendent'}
+                <span className={`estat-pill ${prestec.data_devolucio ? "retornat" : "pendent"}`}>
+                  {prestec.data_devolucio ? "Retornat" : "Pendent"}
                 </span>
               </td>
             </tr>
@@ -105,7 +102,7 @@ export default function HistorialPrestecs() {
         <p>No hi ha préstecs registrats</p>
       ) : (
         <div className="pagination">
-          <button 
+          <button
             className="pagination-arrow"
             onClick={() => handlePageChange(1)}
             disabled={currentPage === 1}
@@ -113,8 +110,8 @@ export default function HistorialPrestecs() {
           >
             <i className="fa-solid fa-angles-left"></i>
           </button>
-          
-          <button 
+
+          <button
             className="pagination-arrow"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -124,18 +121,18 @@ export default function HistorialPrestecs() {
           </button>
 
           <div className="pagination-numbers">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
               <button
                 key={number}
                 onClick={() => handlePageChange(number)}
-                className={`pagination-number ${currentPage === number ? 'active' : ''}`}
+                className={`pagination-number ${currentPage === number ? "active" : ""}`}
               >
                 {number}
               </button>
             ))}
           </div>
 
-          <button 
+          <button
             className="pagination-arrow"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -144,7 +141,7 @@ export default function HistorialPrestecs() {
             <i className="fa-solid fa-angle-right"></i>
           </button>
 
-          <button 
+          <button
             className="pagination-arrow"
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages}

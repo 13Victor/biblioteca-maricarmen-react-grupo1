@@ -6,127 +6,146 @@ import { GoogleIcon, MicrosoftIcon } from "./Icons";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 export default function Login() {
-    const { setIsLogged, setMostrarLogin, setMostrarPerfil } = useContext(AuthContext);
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [doFetch, setDoFetch] = useState(false);
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
+  // Add setUsuari to the destructured context values
+  const {
+    setIsLogged,
+    setMostrarLogin,
+    setMostrarPerfil,
+    setUsuari, // Add this line
+    setIsAdministrador,
+    setIsBilbiotecari,
+  } = useContext(AuthContext);
 
-    // Comprobar si hay un error en los parámetros de URL
-    useEffect(() => {
-        const errorParam = searchParams.get('error');
-        if (errorParam) {
-            if (errorParam === 'auth_failed') {
-                setError('La autenticación ha fallado. Por favor, inténtalo de nuevo.');
-            } else if (errorParam === 'invalid_state') {
-                setError('Error de seguridad. Por favor, inténtalo de nuevo.');
-            } else if (errorParam === 'token_error') {
-                setError('Error al obtener el token. Por favor, inténtalo de nuevo.');
-            } else if (errorParam === 'no_email') {
-                setError('No se pudo obtener tu correo electrónico. Asegúrate de permitir el acceso a tu email.');
-            } else if (errorParam === 'server_error') {
-                setError('Error en el servidor. Por favor, inténtalo más tarde.');
-            }
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [doFetch, setDoFetch] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
+
+  // Fix the useEffect for traditional login
+  useEffect(() => {
+    if (!doFetch) return;
+
+    const fetchToken = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Create Basic Auth header
+        const credentials = btoa(`${username}:${password}`);
+
+        console.log("Sending authentication request...");
+        const response = await fetch(`${API_BASE_URL}/api/token/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Basic ${credentials}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Error de autenticación");
         }
-    }, [searchParams]);
 
-    // Comprobar si hay un token en la URL (callback de autenticación social)
-    useEffect(() => {
-        const token = searchParams.get('token');
-        if (token) {
-            // Hacer una solicitud al backend para verificar el token
-            fetch(`http://localhost:8000/api/token/?social_token=${token}`)
-                .then(response => {
-                    if (!response.ok) throw new Error("Token inválido");
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.token) {
-                        sessionStorage.setItem("token", data.token);
-                        sessionStorage.setItem("userData", JSON.stringify(data.user));
-                        setIsLogged(true);
-                        setMostrarLogin(false);
-                        setMostrarPerfil(true);
-                        navigate('/'); // Redirigir a la página principal
-                    }
-                })
-                .catch(err => {
-                    setError("Error de autenticación: " + err.message);
-                });
+        console.log("Processing authentication response...");
+        const data = await response.json();
+
+        if (data.token) {
+          console.log("Token received, fetching user data...");
+          // Get user data with the token
+          const userResponse = await fetch(`${API_BASE_URL}/api/usuari/`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          });
+
+          if (!userResponse.ok) {
+            throw new Error("Error al obtener datos del usuario");
+          }
+
+          console.log("Processing user data...");
+          const userData = await userResponse.json();
+          console.log("User data received:", { ...userData, token: "***" });
+
+          // Store authentication data
+          sessionStorage.setItem("token", data.token);
+          sessionStorage.setItem("userData", JSON.stringify(userData));
+
+          // Update context (using explicit function calls to avoid reference issues)
+          console.log("Updating auth context...");
+          if (setUsuari) setUsuari(userData);
+          if (setIsLogged) setIsLogged(true);
+          if (setIsAdministrador) setIsAdministrador(userData.is_superuser === true);
+          if (setIsBilbiotecari) setIsBilbiotecari(userData.is_staff === true);
+          if (setMostrarLogin) setMostrarLogin(false);
+
+          console.log("Redirecting to catalog...");
+          // Use setTimeout to ensure state updates before navigation
+          setTimeout(() => navigate("/cataleg"), 100);
+        } else {
+          throw new Error("No se recibió un token válido");
         }
-    }, [searchParams, setIsLogged, setMostrarLogin, setMostrarPerfil, navigate]);
-
-    // Login tradicional con usuario y contraseña
-    useEffect(() => {
-        if (!doFetch) return;
-
-    setIsLoading(true);
-    setError(null);
-    // Usar la URL completa de la API
-    fetch(`${API_BASE_URL}/api/token/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${btoa(username + ":" + password)}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Usuari o contrassenya incorrectes");
-        return response.json();
-      })
-      .then((data) => {
-        sessionStorage.setItem("token", data.token);
-        setIsLogged(true);
-        setMostrarLogin(false);
-        // setMostrarPerfil(true);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => {
+      } catch (error) {
+        console.error("Login error details:", error);
+        setError(error.message || "Error desconocido en inicio de sesión");
+      } finally {
         setIsLoading(false);
         setDoFetch(false);
-      });
-  }, [doFetch, setIsLogged, setMostrarLogin, setMostrarPerfil]);
+      }
+    };
 
-    return (
-        <div id="login-container">
-            <h1>Login</h1>
-            {error && <p style={{ color: "red", padding: "5px" }}>{error}</p>}
-            
-            {/* Botones de inicio de sesión social */}
-            <div className="social-login-section">
-                <SocialLoginButton 
-                    provider="google" 
-                    text="Continuar con Google" 
-                    icon={<GoogleIcon />} 
-                />
-                <SocialLoginButton 
-                    provider="microsoft" 
-                    text="Continuar con Microsoft" 
-                    icon={<MicrosoftIcon />} 
-                />
-                
-                <div className="divider">
-                    <span>O</span>
-                </div>
-            </div>
-            
-            {/* Formulario de inicio de sesión tradicional */}
-            <form onSubmit={(e) => { e.preventDefault(); setDoFetch(true); }}>
-                <div>
-                    <label>Usuari:</label>
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                </div>
-                <div>
-                    <label>Contrasenya:</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <button type="submit" disabled={isLoading}>
-                    {isLoading ? "Carregant..." : "Iniciar Sessió"}
-                </button>
-            </form>
+    fetchToken();
+  }, [
+    doFetch,
+    username,
+    password,
+    API_BASE_URL,
+    setIsLogged,
+    setMostrarLogin,
+    setUsuari,
+    setIsAdministrador,
+    setIsBilbiotecari,
+    navigate,
+  ]);
+
+  return (
+    <div id="login-container">
+      <h1>Login</h1>
+      {error && <p style={{ color: "red", padding: "5px" }}>{error}</p>}
+
+      {/* Botones de inicio de sesión social */}
+      <div className="social-login-section">
+        <SocialLoginButton provider="google" text="Continuar con Google" icon={<GoogleIcon />} />
+        <SocialLoginButton provider="microsoft" text="Continuar con Microsoft" icon={<MicrosoftIcon />} />
+
+        <div className="divider">
+          <span>O</span>
         </div>
-    );
+      </div>
+
+      {/* Formulario de inicio de sesión tradicional */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setDoFetch(true);
+        }}
+      >
+        <div>
+          <label>Usuari:</label>
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+        </div>
+        <div>
+          <label>Contrasenya:</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Carregant..." : "Iniciar Sessió"}
+        </button>
+      </form>
+    </div>
+  );
 }
