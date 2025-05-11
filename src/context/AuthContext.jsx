@@ -42,8 +42,8 @@ export const AuthProvider = ({ children }) => {
       setMostrarPerfil(false);
       setMostrarLogin(false);
 
-      // Redirigir a la página de login
-      window.location.href = "/login?logged_out=true";
+      // Redirigir a la página de catálogo en lugar de login
+      window.location.href = "/cataleg";
     }
   };
 

@@ -5,23 +5,24 @@ import Login from "./Login";
 import "../styles/Header.css";
 
 export default function Header() {
-    const {
-        isLogged,
-        isBilbiotecari,
-        isAdministrador,
-        mostrarPerfil,
-        setMostrarPerfil,
-        mostrarLogin,
-        setMostrarLogin,
-    } = useContext(AuthContext);
+  const {
+    isLogged,
+    isBilbiotecari,
+    isAdministrador,
+    mostrarPerfil,
+    setMostrarPerfil,
+    mostrarLogin,
+    setMostrarLogin,
+    usuari,
+  } = useContext(AuthContext);
 
-    const togglePerfil = () => {
-        setMostrarPerfil((prev) => !prev);
-    };
+  const togglePerfil = () => {
+    setMostrarPerfil((prev) => !prev);
+  };
 
-    const toggleLogin = () => {
-        setMostrarLogin((prev) => !prev);
-    };
+  const toggleLogin = () => {
+    setMostrarLogin((prev) => !prev);
+  };
 
   return (
     <>
@@ -34,14 +35,20 @@ export default function Header() {
             </button>
           ) : (
             <button id="profile-button" onClick={togglePerfil}>
-              {isAdministrador ? "Perfil Administrador" : isBilbiotecari ? "Perfil Bibliotecari" : "Perfil Usuari"}
+              {isAdministrador
+                ? "Perfil Administrador"
+                : isBilbiotecari
+                ? "Perfil Bibliotecari"
+                : usuari
+                ? "Perfil Usuari"
+                : "Perfil Undefined"}
             </button>
           )}
         </div>
       </div>
 
-            {mostrarPerfil && <PerfilUsuari />}
-            {mostrarLogin && !isLogged && <Login />}
-        </>
-    );
+      {mostrarPerfil && <PerfilUsuari />}
+      {mostrarLogin && !isLogged && <Login />}
+    </>
+  );
 }

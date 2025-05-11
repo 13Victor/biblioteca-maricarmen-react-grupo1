@@ -15,6 +15,8 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
+
   // Comprobar si hay un error en los parámetros de URL
   useEffect(() => {
     const errorParam = searchParams.get("error");
