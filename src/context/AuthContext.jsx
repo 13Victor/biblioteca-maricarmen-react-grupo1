@@ -79,8 +79,13 @@ export const AuthProvider = ({ children }) => {
             // Never set isLogged without setting user data
             setUsuari(userData);
             setIsLogged(true);
-            setIsAdministrador(userData.is_superuser || false);
-            setIsBilbiotecari(userData.is_staff || false);
+
+            const isAdmin = userData.is_superuser === true;
+            const isLibrarian = userData.is_staff === true;
+
+            console.log("Setting admin status:", isAdmin, "Setting librarian status:", isLibrarian);
+            setIsAdministrador(isAdmin);
+            setIsBilbiotecari(isLibrarian);
 
             // Make sure we have complete data
             if (storedToken !== "session-auth" && (!userData.first_name || !userData.last_name)) {

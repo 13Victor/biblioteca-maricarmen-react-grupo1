@@ -38,6 +38,7 @@ export default function Login() {
         // Create Basic Auth header
         const credentials = btoa(`${username}:${password}`);
 
+        console.log("Sending authentication request...");
         const response = await fetch(`${API_BASE_URL}/api/token/`, {
           method: "GET",
           headers: {
@@ -50,9 +51,11 @@ export default function Login() {
           throw new Error(errorData.error || "Error de autenticación");
         }
 
+        console.log("Processing authentication response...");
         const data = await response.json();
 
         if (data.token) {
+          console.log("Token received, fetching user data...");
           // Get user data with the token
           const userResponse = await fetch(`${API_BASE_URL}/api/usuari/`, {
             headers: {
@@ -64,27 +67,31 @@ export default function Login() {
             throw new Error("Error al obtener datos del usuario");
           }
 
+          console.log("Processing user data...");
           const userData = await userResponse.json();
+          console.log("User data received:", { ...userData, token: "***" });
 
           // Store authentication data
           sessionStorage.setItem("token", data.token);
           sessionStorage.setItem("userData", JSON.stringify(userData));
 
-          // Update context
-          setUsuari(userData);
-          setIsLogged(true);
-          setIsAdministrador(userData.is_superuser || false);
-          setIsBilbiotecari(userData.is_staff || false);
-          setMostrarLogin(false);
+          // Update context (using explicit function calls to avoid reference issues)
+          console.log("Updating auth context...");
+          if (setUsuari) setUsuari(userData);
+          if (setIsLogged) setIsLogged(true);
+          if (setIsAdministrador) setIsAdministrador(userData.is_superuser === true);
+          if (setIsBilbiotecari) setIsBilbiotecari(userData.is_staff === true);
+          if (setMostrarLogin) setMostrarLogin(false);
 
-          // Redirect to home or profile
-          navigate("/cataleg");
+          console.log("Redirecting to catalog...");
+          // Use setTimeout to ensure state updates before navigation
+          setTimeout(() => navigate("/cataleg"), 100);
         } else {
           throw new Error("No se recibió un token válido");
         }
       } catch (error) {
-        console.error("Login error:", error);
-        setError(error.message);
+        console.error("Login error details:", error);
+        setError(error.message || "Error desconocido en inicio de sesión");
       } finally {
         setIsLoading(false);
         setDoFetch(false);

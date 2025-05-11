@@ -16,22 +16,35 @@ export default function Header() {
     usuari,
   } = useContext(AuthContext);
 
-  const togglePerfil = () => {
-    setMostrarPerfil((prev) => !prev);
-  };
-
+  // Add toggle functions for login and profile
   const toggleLogin = () => {
-    setMostrarLogin((prev) => !prev);
+    setMostrarLogin(!mostrarLogin);
+    if (mostrarPerfil) setMostrarPerfil(false);
   };
 
-  // Add this inside your Header component
+  const togglePerfil = () => {
+    setMostrarPerfil(!mostrarPerfil);
+    if (mostrarLogin) setMostrarLogin(false);
+  };
+
+  // Add enhanced logging
   console.log("Header render state:", {
     isLogged,
     isBilbiotecari,
     isAdministrador,
-    usuari,
+    userData: usuari
+      ? {
+          username: usuari.username,
+          is_staff: usuari.is_staff,
+          is_superuser: usuari.is_superuser,
+        }
+      : null,
     mostrarPerfil,
   });
+
+  // Derive roles from user data as a fallback
+  const hasAdminRole = isAdministrador || (usuari && usuari.is_superuser === true);
+  const hasLibrarianRole = isBilbiotecari || (usuari && usuari.is_staff === true);
 
   return (
     <>
@@ -44,15 +57,13 @@ export default function Header() {
             </button>
           ) : (
             <button id="profile-button" onClick={togglePerfil}>
-              {isAdministrador
+              {hasAdminRole
                 ? "Perfil Administrador"
-                : isBilbiotecari
+                : hasLibrarianRole
                 ? "Perfil Bibliotecari"
                 : usuari && usuari.username
                 ? `Perfil ${usuari.username}`
-                : isLogged
-                ? "Carregant perfil..." // Show loading state when logged in but no user data
-                : "Perfil"}
+                : "Carregant perfil..."}
             </button>
           )}
         </div>
