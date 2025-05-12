@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isBilbiotecari, setIsBilbiotecari] = useState(false);
   const [isAdministrador, setIsAdministrador] = useState(false);
   const [errorProfile, setErrorProfile] = useState(null);
-  const [userCentre, setUserCentre] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Estado para controlar la visibilidad del perfil
   const [mostrarPerfil, setMostrarPerfil] = useState(false);
@@ -18,85 +18,151 @@ export const AuthProvider = ({ children }) => {
   const [mostrarLogin, setMostrarLogin] = useState(false);
 
   // Función para cerrar sesión
-  const handleLogOut = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("userData");
-    setUsuari(null);
-    setIsLogged(false);
-    setIsAdministrador(false);
-    setIsBilbiotecari(false);
-    setMostrarPerfil(false);
-    setMostrarLogin(false);
+  const handleLogOut = async () => {
+    try {
+      // Realizar logout en el backend
+      await fetch("http://localhost:8000/accounts/logout/", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCsrfToken(),
+        },
+      });
+    } catch (error) {
+      console.error("Error en logout:", error);
+    } finally {
+      // Limpiar estados locales
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("userData");
+      setUsuari(null);
+      setIsLogged(false);
+      setIsAdministrador(false);
+      setIsBilbiotecari(false);
+      setMostrarPerfil(false);
+      setMostrarLogin(false);
+
+      // Redirigir a la página de catálogo en lugar de login
+      window.location.href = "/cataleg";
+    }
   };
 
-  // Comprobar si hay un token y actualizar el estado
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (token) {
-      setIsLogged(true);
-    }
-  }, []);
+  // Obtener CSRF token de las cookies
+  const getCsrfToken = () => {
+    const name = "csrftoken=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(";");
 
-  // Comprobar si el usuario es bibliotecario o administrador
-  useEffect(() => {
-    if (usuari) {
-      setIsAdministrador(usuari.is_superuser);
-      setIsBilbiotecari(usuari.is_staff);
-    }
-  }, [usuari]);
-
-  // Fetch de datos de usuario
-  useEffect(() => {
-    if (!isLogged) return;
-    const timeout = setTimeout(() => {
-      const token = sessionStorage.getItem("token");
-
-      if (!token) {
-        setErrorProfile("No s'ha trobat cap usuari. Si us plau, inicia sessió.");
-        return;
+    for (let i = 0; i < cookieArray.length; i++) {
+      let cookie = cookieArray[i].trim();
+      if (cookie.indexOf(name) === 0) {
+        return cookie.substring(name.length, cookie.length);
       }
+    }
 
-      // Usar la misma base URL que en api.js
-      const API_BASE_URL = "http://localhost:8000/api";
+    return "";
+  };
 
-      fetch(`${API_BASE_URL}/usuari/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error en la solicitud: " + response.status);
+  // Verificar la sesión con el backend al cargar
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        // Primero intentamos recuperar datos del sessionStorage
+        const storedUserData = sessionStorage.getItem("userData");
+        const storedToken = sessionStorage.getItem("token");
+
+        if (storedUserData && storedToken) {
+          try {
+            const userData = JSON.parse(storedUserData);
+            console.log("Loading stored user data:", userData);
+
+            // Never set isLogged without setting user data
+            setUsuari(userData);
+            setIsLogged(true);
+
+            const isAdmin = userData.is_superuser === true;
+            const isLibrarian = userData.is_staff === true;
+
+            console.log("Setting admin status:", isAdmin, "Setting librarian status:", isLibrarian);
+            setIsAdministrador(isAdmin);
+            setIsBilbiotecari(isLibrarian);
+
+            // Make sure we have complete data
+            if (storedToken !== "session-auth" && (!userData.first_name || !userData.last_name)) {
+              console.log("Fetching complete user data...");
+              const response = await fetch("http://localhost:8000/api/usuari/", {
+                headers: {
+                  Authorization: `Bearer ${storedToken}`,
+                },
+              });
+
+              if (response.ok) {
+                const completeUserData = await response.json();
+                console.log("Received complete user data:", completeUserData);
+                setUsuari(completeUserData);
+                setIsAdministrador(completeUserData.is_superuser || false);
+                setIsBilbiotecari(completeUserData.is_staff || false);
+                sessionStorage.setItem("userData", JSON.stringify(completeUserData));
+              }
+            }
+          } catch (error) {
+            console.error("Error processing stored user data:", error);
+            // Clear invalid data
+            sessionStorage.removeItem("userData");
+            sessionStorage.removeItem("token");
+            setUsuari(null);
+            setIsLogged(false);
           }
-          return response.json();
-        })
-        .then((data) => {
-          setUsuari(data);
-          // IMPORTANT: Store user data in sessionStorage for access across routes
-          sessionStorage.setItem("userData", JSON.stringify(data));
-          console.log("User data stored in session:", data);
+        } else {
+          // No data in sessionStorage, try with session endpoint
+          try {
+            const response = await fetch("http://localhost:8000/api/auth/session/", {
+              credentials: "include",
+            });
 
-          // Set user center information - handle both object and string formats
-          if (data.centre) {
-            // Ensure we have a proper object with id and nom
-            const centreInfo =
-              typeof data.centre === "object" && data.centre !== null ? data.centre : { id: null, nom: data.centre };
+            if (response.ok) {
+              const data = await response.json();
+              console.log("Session check response:", data);
 
-            setUserCentre(centreInfo);
-            console.log("Setting user centre:", centreInfo);
-          } else {
-            setUserCentre(null);
+              if (data.isAuthenticated && data.user) {
+                // Always set user data together with isLogged
+                setUsuari(data.user);
+                setIsLogged(true);
+                setIsAdministrador(data.user.is_superuser || false);
+                setIsBilbiotecari(data.user.is_staff || false);
+                sessionStorage.setItem("userData", JSON.stringify(data.user));
+                sessionStorage.setItem("token", "session-auth");
+              } else {
+                // Clear all state if not authenticated
+                setUsuari(null);
+                setIsLogged(false);
+                setIsAdministrador(false);
+                setIsBilbiotecari(false);
+              }
+            } else {
+              // Session check failed, ensure logged out state
+              setUsuari(null);
+              setIsLogged(false);
+            }
+          } catch (error) {
+            console.error("Error checking session:", error);
+            setUsuari(null);
+            setIsLogged(false);
           }
-        })
-        .catch((error) => {
-          console.error("Error al obtenir les dades:", error);
-          setErrorProfile("Error al obtenir les dades");
-        });
-    }, 100);
+        }
+      } catch (error) {
+        console.error("Authentication check error:", error);
+        setErrorProfile("Error al verificar la sesión");
+        // Ensure user is logged out on error
+        setUsuari(null);
+        setIsLogged(false);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timeout);
-  }, [isLogged]);
+    checkAuthentication();
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -114,7 +180,7 @@ export const AuthProvider = ({ children }) => {
         mostrarLogin,
         setMostrarLogin,
         handleLogOut,
-        userCentre,
+        loading,
       }}
     >
       {children}

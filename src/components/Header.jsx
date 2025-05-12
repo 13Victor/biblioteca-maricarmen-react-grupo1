@@ -16,13 +16,35 @@ export default function Header() {
         usuari,
     } = useContext(AuthContext);
 
-    const togglePerfil = () => {
-        setMostrarPerfil((prev) => !prev);
-    };
+  // Add toggle functions for login and profile
+  const toggleLogin = () => {
+    setMostrarLogin(!mostrarLogin);
+    if (mostrarPerfil) setMostrarPerfil(false);
+  };
 
-    const toggleLogin = () => {
-        setMostrarLogin((prev) => !prev);
-    };
+  const togglePerfil = () => {
+    setMostrarPerfil(!mostrarPerfil);
+    if (mostrarLogin) setMostrarLogin(false);
+  };
+
+  // Add enhanced logging
+  console.log("Header render state:", {
+    isLogged,
+    isBilbiotecari,
+    isAdministrador,
+    userData: usuari
+      ? {
+          username: usuari.username,
+          is_staff: usuari.is_staff,
+          is_superuser: usuari.is_superuser,
+        }
+      : null,
+    mostrarPerfil,
+  });
+
+  // Derive roles from user data as a fallback
+  const hasAdminRole = isAdministrador || (usuari && usuari.is_superuser === true);
+  const hasLibrarianRole = isBilbiotecari || (usuari && usuari.is_staff === true);
 
   return (
     <>
@@ -45,8 +67,8 @@ export default function Header() {
         </div>
       </div>
 
-            {mostrarPerfil && <PerfilUsuari />}
-            {mostrarLogin && !isLogged && <Login />}
-        </>
-    );
+      {mostrarPerfil && <PerfilUsuari />}
+      {mostrarLogin && !isLogged && <Login />}
+    </>
+  );
 }
